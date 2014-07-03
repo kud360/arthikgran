@@ -71,7 +71,7 @@ class OMRImage {
     private function stripBlackAverage($image, $coord, $margin, $stripLength = 5,$dir = FALSE) {
 
         $slider = array();
-        if ( $dir?($dir=='x'):($margin == $this->xMargin) ) {
+        if ( $dir?($dir=='x'):($margin != $this->xMargin) ) {
             for ($i = 0; $i < $stripLength; $i++) {
                 $slider[$i] = $this->isBlack($image, $margin + $i, $coord);
             }
