@@ -41,7 +41,7 @@ class OMRImage {
         $this->originalHeight = $this->originalImage->height();
         $this->originalWidth = $this->originalImage->width();
         $this->validateAspect();
-        $this->cellSize = $this->originalHeight;
+        $this->cellSize = $this->originalHeight/82.7;
         $this->tolerance = pow($this->cellSize, 2) * $this->torelanceConstant;
         $this->xMargin = $this->marginSafety * $this->originalWidth;
         $this->yMargin = $this->marginSafety * $this->originalHeight;
