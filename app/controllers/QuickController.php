@@ -22,7 +22,8 @@ class QuickController extends BaseController {
         
         public function parseSingle()
         {
-                
+                echo "Hey";
+                return;
         }
 
 }

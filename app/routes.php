@@ -23,3 +23,5 @@ Route::get('/phpinfo', function()
 });
 
 Route::get('/quick/single', 'QuickController@single');
+
+Route::post('/quick/single', 'QuickController@parseSingle');
