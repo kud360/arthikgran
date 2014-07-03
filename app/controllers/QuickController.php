@@ -27,15 +27,10 @@ class QuickController extends BaseController {
         if ($validator->fails()) {
             return Redirect::to('quick/single')->withErrors($validator);
         }   else    {
-            parseImage(Image::make(Input::file('image')));            
+            $omr = OMRImage::make(Image::make(Input::file('image')));            
         }
         echo "Hey";
         return;
-    }
-
-    private function parseImage($image) {
-        
-        
     }
 
 }
