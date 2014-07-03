@@ -28,8 +28,8 @@ class QuickController extends BaseController {
             return Redirect::to('quick/single')->withErrors($validator);
         }   else    {
             $omr = OMRImage::make(Image::make(Input::file('image')));            
-        }
-        echo "Hey";
+            return $omr->optimizedImage->response();
+        }        
         return;
     }
 
