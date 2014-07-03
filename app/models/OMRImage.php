@@ -31,6 +31,7 @@ class OMRImage {
         $newImage = new OMRImage();
         $newImage->originalImage = $image;
         $newImage->setVariables();
+        return $newImage;
     }
 
     public function printDetails() {
