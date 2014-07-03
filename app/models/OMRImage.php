@@ -46,10 +46,14 @@ class OMRImage {
         $this->xMargin = $this->marginSafety * $this->originalWidth;
         $this->yMargin = $this->marginSafety * $this->originalHeight;
         $this->xCoord = $this->detectGridPoints($this->originalImage, $this->yMargin, $this->originalWidth);
+        Log::info(count($this->xCoord).' X Coords detected originally',  $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->originalImage, $this->xMargin, $this->originalHeight);
+        Log::info(count($this->yCoord).' Y Coords detected originally',  $this->yCoord);
         $this->optimizedImage = $this->correctSkew($this->originalImage);
         $this->xCoord = $this->detectGridPoints($this->optimizedImage, $this->yMargin, $this->originalWidth);
+        Log::info(count($this->xCoord).' X Coords detected after correction',  $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->optimizedImage, $this->xMargin, $this->originalHeight);
+        Log::info(count($this->yCoord).' Y Coords detected after correction',  $this->yCoord);
     }
 
     private function validateAspect() {
@@ -72,7 +76,7 @@ class OMRImage {
                 $slider[$i] = $this->isBlack($image, $margin + $i, $coord);
             }
         } else {
-            for ($i = 0; i < $stripLength; $i++) {
+            for ($i = 0; $i < $stripLength; $i++) {
                 $slider[$i] = $this->isBlack($image, $coord, $margin + $i);
             }
         }
