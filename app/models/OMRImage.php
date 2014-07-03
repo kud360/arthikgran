@@ -88,7 +88,10 @@ class OMRImage {
         if ($x < 0 || $y < 0 || $x > $image->width() || $y > $image->height()) {
             return 0;
         } else {
-            $rgb = $image->pickColor(round($x), round($y), 'rgb');
+            $rgb = $image->pickColor((int)$x, (int)$y, 'rgb');
+            
+            Log::info('rgb value: ',array("rgb" => $rgb));
+            
             if ($rgb['red'] < 50 && $rgb['green'] < 50 && $rgb['blue'] < 50) {
                 return 1;
             } else {
