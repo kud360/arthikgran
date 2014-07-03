@@ -230,8 +230,8 @@ class OMRImage {
 
     public function debugImage() {
         $debugImage = clone $this->optimizedImage;
-        $this->drawGuides(&$debugImage);
-        $this->drawMargins(&$debugImage);
+        $this->drawGuides($debugImage);
+        $this->drawMargins($debugImage);
         return $debugImage;
     }
 
