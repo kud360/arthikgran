@@ -193,7 +193,7 @@ class OMRImage {
         $white_count = 0;
         
         for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
-            if ($this->stripBlackAverage($image, $i, $top_y-2) > 3) {
+            if ($this->stripBlackAverage($image, $i, $top_y-2,5,'y') > 3) {
                 $white_count = 0;
             } else {
                 $white_count = $white_count + 1;
@@ -208,7 +208,7 @@ class OMRImage {
         $white_count = 0;
         $b = array();
         for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
-            if ($this->stripBlackAverage($image, $i, $bottom_y-2) > 3) {
+            if ($this->stripBlackAverage($image, $i, $bottom_y-2,5,'x') > 3) {
                 $white_count = 0;
             } else {
                 $white_count = $white_count + 1;
