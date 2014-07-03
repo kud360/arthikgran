@@ -72,7 +72,7 @@ class OMRImage {
 
         $slider = array();
         if ( $dir?($dir=='x'):($margin == $this->xMargin) ) {
-            for ($i = 0; i < $stripLength; $i++) {
+            for ($i = 0; $i < $stripLength; $i++) {
                 $slider[$i] = $this->isBlack($image, $margin + $i, $coord);
             }
         } else {
@@ -90,7 +90,7 @@ class OMRImage {
         } else {
             $rgb = $image->pickColor((int)$x, (int)$y);
             
-            Log::info('rgb value: ',array("rgb" => $rgb));
+            //Log::info('rgb value: ',array("rgb" => $rgb));
             
             if ($rgb[0] < 50 && $rgb[1] < 50 && $rgb[2] < 50) {
                 return 1;
