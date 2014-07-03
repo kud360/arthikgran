@@ -170,7 +170,7 @@ class OMRImage {
             if ($stripStartfound == 'yes' && $stripEndFound == 'yes') {
                 //$peaks[]=round(($first+$second)/2,0);
                 Log::debug("Peak at : ".round(($stripStart + $stripEnd) / 2.0));
-                $peaks[] = round(($stripStart + $stripEnd) / 2.0);                
+                $stripCoords[] = round(($stripStart + $stripEnd) / 2.0);                
                 $stripStartfound = 'no';
                 $stripEndFound = 'no';
             }
