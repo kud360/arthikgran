@@ -39,6 +39,7 @@
             <h3>Auto Correction System</h3>
             <?= Form::open(array('url' => 'quick/single', 'files' => true)) ?>
                 <?= Form::file('image') ?>
+                <?= Form::submit('Check') ?>
             <?= Form::close() ?>
         </div>
     </body>
