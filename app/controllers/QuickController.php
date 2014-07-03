@@ -15,12 +15,12 @@ class QuickController extends BaseController {
 	|
 	*/
 
-	public function form()
+	public function single()
 	{
-		return View::make('hello');
+		return View::make('quickform');
 	}
         
-        public function single()
+        public function parseSingle()
         {
                 
         }
