@@ -20,7 +20,7 @@ class OMRImage {
     private $tolerance;
     private $xMargin;
     private $yMargin;
-    private $marginSafety = 0.03;
+    private $marginSafety = 0.06;
     private $torelanceConstant = 0.7;
     private $yCoord;
     private $xCoord;
@@ -48,8 +48,8 @@ class OMRImage {
         $this->validateAspect();
         $this->cellSize = $this->originalHeight/82.7;
         $this->tolerance = pow($this->cellSize, 2) * $this->torelanceConstant;
-        $this->yMargin = $this->marginSafety * $this->originalWidth;
-        $this->xMargin = $this->marginSafety * $this->originalHeight;
+        $this->xMargin = $this->marginSafety * $this->originalWidth;
+        $this->yMargin = $this->marginSafety * $this->originalHeight;
         $this->xCoord = $this->detectGridPoints($this->originalImage, $this->yMargin, $this->originalWidth);
         Log::info(count($this->xCoord).' X Coords detected originally',  $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->originalImage, $this->xMargin, $this->originalHeight);
