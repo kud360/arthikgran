@@ -28,7 +28,7 @@ class OMRImage {
 
     public static function make($image) {
 
-        $newImage = new ORMImage();
+        $newImage = new OMRImage();
         $newImage->originalImage = $image;
         $newImage->setVariables();
     }
