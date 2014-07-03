@@ -238,14 +238,12 @@ class OMRImage {
     private function drawGuides($image) {
         foreach ($this->xCoord as $point) {
             $image->line($point, 0, $point, $this->originalHeight, function ($draw) {
-                $draw->color('#555');
-                $draw->width(2);
+                $draw->color('#555');                
             });
         }
         foreach ($this->xCoord as $point) {
             $image->line(0, $point, $this->originalWidth, $point, function ($draw) {
-                $draw->color('#555');
-                $draw->width(2);
+                $draw->color('#555');                
             });
         }
     }
