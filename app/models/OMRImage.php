@@ -92,7 +92,7 @@ class OMRImage {
             
             Log::info('rgb value: ',array("rgb" => $rgb));
             
-            if ($rgb['red'] < 50 && $rgb['green'] < 50 && $rgb['blue'] < 50) {
+            if ($rgb[0] < 50 && $rgb[1] < 50 && $rgb[2] < 50) {
                 return 1;
             } else {
                 return 0;
