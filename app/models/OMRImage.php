@@ -37,7 +37,7 @@ class OMRImage {
     public function printDetails() {
         var_dump($this);
     }
-    
+
     public function image() {
         return $this->optimizedImage;
     }
@@ -46,19 +46,19 @@ class OMRImage {
         $this->originalHeight = $this->originalImage->height();
         $this->originalWidth = $this->originalImage->width();
         $this->validateAspect();
-        $this->cellSize = $this->originalHeight/82.7;
+        $this->cellSize = $this->originalHeight / 82.7;
         $this->tolerance = pow($this->cellSize, 2) * $this->torelanceConstant;
         $this->xMargin = $this->marginSafety * $this->originalWidth;
         $this->yMargin = $this->marginSafety * $this->originalHeight;
         $this->xCoord = $this->detectGridPoints($this->originalImage, $this->yMargin, $this->originalWidth);
-        Log::info(count($this->xCoord).' X Coords detected originally',  $this->xCoord);
+        Log::info(count($this->xCoord) . ' X Coords detected originally', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->originalImage, $this->xMargin, $this->originalHeight);
-        Log::info(count($this->yCoord).' Y Coords detected originally',  $this->yCoord);
+        Log::info(count($this->yCoord) . ' Y Coords detected originally', $this->yCoord);
         $this->optimizedImage = $this->correctSkew($this->originalImage);
         $this->xCoord = $this->detectGridPoints($this->optimizedImage, $this->yMargin, $this->originalWidth);
-        Log::info(count($this->xCoord).' X Coords detected after correction',  $this->xCoord);
+        Log::info(count($this->xCoord) . ' X Coords detected after correction', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->optimizedImage, $this->xMargin, $this->originalHeight);
-        Log::info(count($this->yCoord).' Y Coords detected after correction',  $this->yCoord);
+        Log::info(count($this->yCoord) . ' Y Coords detected after correction', $this->yCoord);
     }
 
     private function validateAspect() {
@@ -73,10 +73,10 @@ class OMRImage {
         }
     }
 
-    private function stripBlackAverage($image, $coord, $margin, $stripLength = 5,$dir = FALSE) {
+    private function stripBlackAverage($image, $coord, $margin, $stripLength = 5, $dir = FALSE) {
 
         $slider = array();
-        if ( $dir?($dir=='x'):($margin != $this->xMargin) ) {
+        if ($dir ? ($dir == 'x') : ($margin != $this->xMargin)) {
             for ($i = 0; $i < $stripLength; $i++) {
                 $slider[$i] = $this->isBlack($image, $margin + $i, $coord);
             }
@@ -93,10 +93,10 @@ class OMRImage {
         if ($x < 0 || $y < 0 || $x >= $image->width() || $y >= $image->height()) {
             return 0;
         } else {
-            $rgb = $image->pickColor((int)$x, (int)$y);
-            
+            $rgb = $image->pickColor((int) $x, (int) $y);
+
             //Log::info('rgb value: ',array("rgb" => $rgb));
-            
+
             if ($rgb[0] < 50 && $rgb[1] < 50 && $rgb[2] < 50) {
                 return 1;
             } else {
@@ -119,8 +119,8 @@ class OMRImage {
                 $blackBooleanAxis[$i] = 0;
             }
         }
-        
-        Log::debug("blackBooleanAxis : ",$blackBooleanAxis);
+
+        Log::debug("blackBooleanAxis : ", $blackBooleanAxis);
 
         //It uses a slider along Y-axis and calculate's the average blackness
         //e.g. a point in vertical middle of the strip would score the highest
@@ -137,9 +137,8 @@ class OMRImage {
                             $blackBooleanAxis, $offset, $length
             ));
         }
-        
-        //Log::debug("cellAverageGrid : ",$cellAverageGrid);
 
+        //Log::debug("cellAverageGrid : ",$cellAverageGrid);
         //Flattens out white points beyond a threshold
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
@@ -147,8 +146,8 @@ class OMRImage {
                 $cellAverageGrid[$i] = 0;
             }
         }
-        
-        Log::debug("cellAverageGrid : ",$cellAverageGrid);
+
+        Log::debug("cellAverageGrid : ", $cellAverageGrid);
 
         // Finding the co-rodinate of strips
         // the centre would have highest surrounding blackness
@@ -172,15 +171,15 @@ class OMRImage {
                 $stripEndFound = 'yes';
             }
 
-            if ($stripStartfound == 'yes' && $stripEndFound == 'yes') {                
+            if ($stripStartfound == 'yes' && $stripEndFound == 'yes') {
                 //Log::debug("Peak at : ".round(($stripStart + $stripEnd) / 2.0));
-                $stripCoords[] = round(($stripStart + $stripEnd) / 2.0);                
+                $stripCoords[] = round(($stripStart + $stripEnd) / 2.0);
                 $stripStartfound = 'no';
                 $stripEndFound = 'no';
             }
         }
-        
-        Log::debug("stripCoords : ",$stripCoords);
+
+        Log::debug("stripCoords : ", $stripCoords);
 
         return $stripCoords;
     }
@@ -191,9 +190,9 @@ class OMRImage {
         $bottom_y = $this->yCoord[count($this->yCoord) - 1];
 
         $white_count = 0;
-        
+
         for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
-            if ($this->stripBlackAverage($image, $i, $top_y-2,5,'y') > 3) {
+            if ($this->stripBlackAverage($image, $i, $top_y - 2, 5, 'y') > 3) {
                 $white_count = 0;
             } else {
                 $white_count = $white_count + 1;
@@ -208,7 +207,7 @@ class OMRImage {
         $white_count = 0;
         $b = array();
         for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
-            if ($this->stripBlackAverage($image, $i, $bottom_y-2,5,'x') > 3) {
+            if ($this->stripBlackAverage($image, $i, $bottom_y - 2, 5, 'x') > 3) {
                 $white_count = 0;
             } else {
                 $white_count = $white_count + 1;
@@ -223,10 +222,43 @@ class OMRImage {
         $angle_radian = asin(($bottom_y - $top_y) / $hyp);
         $angle_degree = ($angle_radian / (2 * pi())) * 360;
         $rotation = 90 - $angle_degree;
-        Log::info("Rotation : ".$rotation);
+        Log::info("Rotation : " . $rotation);
         $newImage = clone $image;
-        $newImage->rotate($rotation, 0xFFFFFF)->resizeCanvas($this->originalWidth,$this->originalHeight, 'top-left', false, 'ffffff');
+        $newImage->rotate($rotation, 0xFFFFFF)->resizeCanvas($this->originalWidth, $this->originalHeight, 'top-left', false, 'ffffff');
         return $newImage;
-        
-    }    
+    }
+
+    public function debugImage() {
+        $debugImage = clone $this->optimizedImage();
+        $this->drawGuides($image);
+        $this->drawMargins($image);
+        return $debugImage;
+    }
+
+    private function drawGuides($image) {
+        foreach ($this->xCoord as $point) {
+            $image->line($point, 0, $point, $this->originalHeight, function ($draw) {
+                $draw->color('#555');
+                $draw->width(2);
+            });
+        }
+        foreach ($this->xCoord as $point) {
+            $image->line(0, $point, $this->originalWidth, $point, function ($draw) {
+                $draw->color('#555');
+                $draw->width(2);
+            });
+        }
+    }
+
+    private function drawMargins($image) {
+        $image->line($this->xMargin, 0, $this->xMargin, $this->originalHeight, function ($draw) {
+            $draw->color('#eee');
+            $draw->width(3);
+        });
+        $image->line(0, $this->yMargin, $this->originalWidth, $this->yMargin, function ($draw) {
+            $draw->color('#eee');
+            $draw->width(3);
+        });
+    }
+
 }
