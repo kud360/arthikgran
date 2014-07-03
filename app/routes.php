@@ -21,3 +21,5 @@ Route::get('/phpinfo', function()
         phpinfo();
 	return 1;
 });
+
+Route::get('/quick/single', 'QuickController@single');
