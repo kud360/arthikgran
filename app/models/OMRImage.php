@@ -142,6 +142,8 @@ class OMRImage {
                 $cellAverageGrid[$i] = 0;
             }
         }
+        
+        Log::debug("cellAverageGrid : ",$cellAverageGrid);
 
         // Finding the co-rodinate of strips
         // the centre would have highest surrounding blackness
@@ -165,7 +167,8 @@ class OMRImage {
 
             if ($cellAverageGrid == 'yes' && $stripEndFound == 'yes') {
                 //$peaks[]=round(($first+$second)/2,0);
-                $peaks[] = ($stripStart + $stripEnd) / 2;
+                Log::debug("Peak at : ".round(($stripStart + $stripEnd) / 2.0));
+                $peaks[] = round(($stripStart + $stripEnd) / 2.0);                
                 $stripStartfound = 'no';
                 $stripEndFound = 'no';
             }
