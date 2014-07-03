@@ -36,6 +36,10 @@ class OMRImage {
     public function printDetails() {
         var_dump($this);
     }
+    
+    public function image() {
+        return $this->optimizedImage;
+    }
 
     private function setVariables() {
         $this->originalHeight = $this->originalImage->height();
