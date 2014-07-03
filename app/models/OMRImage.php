@@ -225,7 +225,7 @@ class OMRImage {
         $rotation = 90 - $angle_degree;
         Log::info("Rotation : ".$rotation);
         $newImage = clone $image;
-        $newImage->rotate(360 - $rotation, 0xFFFFFF)->resizeCanvas($this->originalWidth,$this->originalHeight, 'top-left', false, 'ffffff');
+        $newImage->rotate($rotation, 0xFFFFFF)->resizeCanvas($this->originalWidth,$this->originalHeight, 'top-left', false, 'ffffff');
         return $newImage;
         
     }    
