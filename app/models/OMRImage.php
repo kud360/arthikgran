@@ -252,12 +252,10 @@ class OMRImage {
 
     private function drawMargins($image) {
         $image->line($this->xMargin, 0, $this->xMargin, $this->originalHeight, function ($draw) {
-            $draw->color('#eee');
-            $draw->width(3);
+            $draw->color('#eee');            
         });
         $image->line(0, $this->yMargin, $this->originalWidth, $this->yMargin, function ($draw) {
-            $draw->color('#eee');
-            $draw->width(3);
+            $draw->color('#eee');            
         });
     }
 
