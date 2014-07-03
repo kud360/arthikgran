@@ -114,6 +114,8 @@ class OMRImage {
                 $blackBooleanAxis[$i] = 0;
             }
         }
+        
+        Log::debug("blackBooleanAxis : ",$blackBooleanAxis);
 
         //It uses a slider along Y-axis and calculate's the average blackness
         //e.g. a point in vertical middle of the strip would score the highest
@@ -130,6 +132,8 @@ class OMRImage {
                             $blackBooleanAxis, $offset, $length
             ));
         }
+        
+        Log::debug("cellAverageGrid : ",$cellAverageGrid);
 
         //Flattens out white points beyond a threshold
 
@@ -166,6 +170,8 @@ class OMRImage {
                 $stripEndFound = 'no';
             }
         }
+        
+        Log::debug("stripCoords : ",$stripCoords);
 
         return $stripCoords;
     }
