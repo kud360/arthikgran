@@ -54,17 +54,13 @@ class OMRImage {
 
     private function validateAspect() {
 
-        class AspectRatioException extends Exception {
-            
-        }
-
         $aspectRatio = $this->originalWidth / $this->originalHeight;
         if ($aspectRatio > 0.704 && $aspectRatio < 0.712) {
             Log::info('Aspect ratio validates A4 compliance.');
             Log::info('Image DPI detected: ' . ($this->originalWidth / 8.27) . 'X' . ($this->originalHeight / 11.7));
         } else {
             Log::error('Aspect ratio out of bounds for A4 limits');
-            throw new AspectRatioException;
+            throw new Exception;
         }
     }
 
