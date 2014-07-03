@@ -167,9 +167,8 @@ class OMRImage {
                 $stripEndFound = 'yes';
             }
 
-            if ($stripStartfound == 'yes' && $stripEndFound == 'yes') {
-                //$peaks[]=round(($first+$second)/2,0);
-                Log::debug("Peak at : ".round(($stripStart + $stripEnd) / 2.0));
+            if ($stripStartfound == 'yes' && $stripEndFound == 'yes') {                
+                //Log::debug("Peak at : ".round(($stripStart + $stripEnd) / 2.0));
                 $stripCoords[] = round(($stripStart + $stripEnd) / 2.0);                
                 $stripStartfound = 'no';
                 $stripEndFound = 'no';
@@ -219,6 +218,7 @@ class OMRImage {
         $angle_radian = asin(($bottom_y - $top_y) / $hyp);
         $angle_degree = ($angle_radian / (2 * pi())) * 360;
         $rotation = 90 - $angle_degree;
+        Log::info("Rotation : ".$rotation);
         $newImage = clone $image;
         $newImage->rotate(360 - $rotation, 0xFFFFFF)->resizeCanvas($this->originalWidth,$this->originalHeight, 'top-left', false, 'ffffff');
         return $newImage;
