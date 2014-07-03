@@ -133,7 +133,7 @@ class OMRImage {
             ));
         }
         
-        Log::debug("cellAverageGrid : ",$cellAverageGrid);
+        //Log::debug("cellAverageGrid : ",$cellAverageGrid);
 
         //Flattens out white points beyond a threshold
 
@@ -157,15 +157,17 @@ class OMRImage {
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
             if ($cellAverageGrid[$i] > 0 && $stripStartfound == 'no' && $stripEndFound == 'no') {
+                //Log::debug("Starting peak at :".$i);
                 $stripStart = $i;
                 $stripStartfound = 'yes';
             }
             if ($cellAverageGrid[$i] == 0 && $stripStartfound == 'yes' && $stripEndFound == 'no') {
+                //Log::debug("Ending peak at :".$i);
                 $stripEnd = $i;
                 $stripEndFound = 'yes';
             }
 
-            if ($cellAverageGrid == 'yes' && $stripEndFound == 'yes') {
+            if ($stripStartfound == 'yes' && $stripEndFound == 'yes') {
                 //$peaks[]=round(($first+$second)/2,0);
                 Log::debug("Peak at : ".round(($stripStart + $stripEnd) / 2.0));
                 $peaks[] = round(($stripStart + $stripEnd) / 2.0);                
