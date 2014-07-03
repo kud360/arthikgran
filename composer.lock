@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cfa9199d0592fc31686713ec22379b81",
+    "hash": "540056aea1a577ffee5e8045102f0242",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -282,6 +282,59 @@
                 "tokenizer"
             ],
             "time": "2013-10-09 04:20:00"
+        },
+        {
+            "name": "kmd/logviewer",
+            "version": "1.1.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mikemand/logviewer.git",
+                "reference": "8dd82a43c944df00d3e4a99db8892144d9082aa2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikemand/logviewer/zipball/8dd82a43c944df00d3e4a99db8892144d9082aa2",
+                "reference": "8dd82a43c944df00d3e4a99db8892144d9082aa2",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/filesystem": "~4",
+                "illuminate/support": "~4",
+                "php": ">=5.3.7",
+                "psr/log": "~1.0",
+                "symfony/finder": "2.3.*|2.4.*"
+            },
+            "require-dev": {
+                "mockery/mockery": "0.8.0",
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+
+                ],
+                "psr-0": {
+                    "Kmd\\Logviewer": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Micheal Mand - KMDWebDesigns",
+                    "email": "micheal@kmdwebdesigns.com"
+                }
+            ],
+            "description": "Laravel 4 log file viewer.",
+            "keywords": [
+                "laravel",
+                "log",
+                "log viewer",
+                "logviewer"
+            ],
+            "time": "2014-02-04 01:24:08"
         },
         {
             "name": "laravel/framework",
