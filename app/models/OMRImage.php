@@ -38,8 +38,8 @@ class OMRImage {
     }
 
     private function setVariables() {
-        $this->originalHeight = $this->origninalImage->height();
-        $this->originalWidth = $this->origninalImage->width();
+        $this->originalHeight = $this->originalImage->height();
+        $this->originalWidth = $this->originalImage->width();
         $this->validateAspect();
         $this->cellSize = $this->originalHeight;
         $this->tolerance = pow($this->cellSize, 2) * $this->torelanceConstant;
