@@ -130,8 +130,8 @@ class OMRImage {
         //The position of this margin should idealy overlay on black strips
 
         $sliderDir = (round($image->height()) == round($axisMaxValue)) ? 'x' : 'y';
-        
-        Log::debug("slideDir : ".$sliderDir." Margin : ".$margin." Axis: ".$axisMaxValue);
+
+        Log::debug("slideDir : " . $sliderDir . " Margin : " . $margin . " Axis: " . $axisMaxValue);
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
             if ($this->stripBlackAverage($image, $i, $margin, $sliderDir) > 3) {
@@ -246,19 +246,31 @@ class OMRImage {
         $angle_degree = ($angle_radian / (2 * pi())) * 360;
         $rotation = 90 - $angle_degree;
         Log::info("Rotation : " . $rotation, array(
-            "bottom_margin" => $bottom_margin,
-            "bottom_top" => $bottom_margin
+            "bottom_x" => $bottom_margin,
+            "bottom_y" => $bottom_y,
+            "top_x" => $top_margin,
+            "top_y" => $top_y
         ));
         $newImage = clone $image;
         $newImage->rotate($rotation, 0xFFFFFF)
                 ->resizeCanvas(
                         (int) $image->width(), (int) $image->height(), 'top-left', false, 'ffffff');
+        
+        $image->circle(10, $bottom_margin, $bottom_y, function ($draw) {
+            $draw->background('#0000ff');
+            $draw->border(1, '#f00');
+        });
+        
+        $image->circle(10, $top_margin, $top_y, function ($draw) {
+            $draw->background('#0000ff');
+            $draw->border(1, '#f00');
+        });
         return $newImage;
     }
 
     public function debugImage() {
-        $debugImage = clone $this->optimizedImage;
-        $this->drawGuides($debugImage);
+        $debugImage = clone $this->originalImage;
+        //$this->drawGuides($debugImage);
         $this->drawMargins($debugImage);
         return $debugImage;
     }
