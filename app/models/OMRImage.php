@@ -212,30 +212,46 @@ class OMRImage {
 
         $white_count = 0;
 
-        for ($i = $this->xMargin; $i < $image->height(); $i++) {
+        for ($i = $this->xMargin; $i < $image->width(); $i++) {
             if ($this->stripBlackAverage($image, $i, $top_y - 2, 'y', 5) > 3) {
                 $white_count = 0;
             } else {
-                $white_count = $white_count + 1;
+                if ($this->stripBlackAverage($image, $i, $top_y - 4, 'y', 5) > 3) {
+                    $top_y-=2;
+                    $white_count = 0;
+                } elseif ($this->stripBlackAverage($image, $i, $top_y, 'y', 5) < 3) {
+                    $top_y+=2;
+                    $white_count = 0;
+                } else {
+                    $white_count = $white_count + 1;
+                }
             }
             if ($white_count == 5) {
-                break;
+                if ($i)
+                    break;
             }
         }
         $top_margin = $i - 5;
-
-
-        $white_count = 0;
-        $b = array();
-        for ($i = $this->xMargin; $i < $image->height(); $i++) {
+        
+        $white_count = 0;        
+        for ($i = $this->xMargin; $i < $image->width(); $i++) {
             if ($this->stripBlackAverage($image, $i, $bottom_y - 2, 'y', 5) > 3) {
                 $white_count = 0;
             } else {
-                $white_count = $white_count + 1;
+                if ($this->stripBlackAverage($image, $i, $bottom_y - 4, 'y', 5) > 3) {
+                    $bottom_y-=2;
+                    $white_count = 0;
+                } elseif ($this->stripBlackAverage($image, $i, $bottom_y, 'y', 5) < 3) {
+                    $bottom_y+=2;
+                    $white_count = 0;
+                } else {
+                    $white_count = $white_count + 1;
+                }
             }
             if ($white_count == 5) {
-                break;
-            }
+                if ($i)
+                    break;
+            }F
         }
         $bottom_margin = $i - 5;
 
@@ -255,12 +271,12 @@ class OMRImage {
         $newImage->rotate($rotation, 0xFFFFFF)
                 ->resizeCanvas(
                         (int) $image->width(), (int) $image->height(), 'top-left', false, 'ffffff');
-        
+
         $image->circle(10, $bottom_margin, $bottom_y, function ($draw) {
             $draw->background('#0000ff');
             $draw->border(1, '#f00');
         });
-        
+
         $image->circle(10, $top_margin, $top_y, function ($draw) {
             $draw->background('#0000ff');
             $draw->border(1, '#f00');
