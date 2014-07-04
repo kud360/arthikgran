@@ -268,8 +268,7 @@ class OMRImage {
             "top_y" => $top_y
         ));
         $newImage = clone $image;
-        if ($rotation != 0) {
-            ini_set('memory_limit','512M');
+        if (abs($rotation) > 0.05) {            
             $newImage->rotate($rotation, 0xFFFFFF)
                     ->resizeCanvas(
                             (int) $image->width(), (int) $image->height(), 'top-left', false, 'ffffff');
