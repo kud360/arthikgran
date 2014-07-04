@@ -271,22 +271,12 @@ class OMRImage {
         $newImage->rotate($rotation, 0xFFFFFF)
                 ->resizeCanvas(
                         (int) $image->width(), (int) $image->height(), 'top-left', false, 'ffffff');
-
-        $image->circle(10, $bottom_margin, $bottom_y, function ($draw) {
-            $draw->background('#0000ff');
-            $draw->border(1, '#f00');
-        });
-
-        $image->circle(10, $top_margin, $top_y, function ($draw) {
-            $draw->background('#0000ff');
-            $draw->border(1, '#f00');
-        });
         return $newImage;
     }
 
     public function debugImage() {
-        $debugImage = clone $this->originalImage;
-        //$this->drawGuides($debugImage);
+        $debugImage = clone $this->optimizedImage;
+        $this->drawGuides($debugImage);
         $this->drawMargins($debugImage);
         return $debugImage;
     }
