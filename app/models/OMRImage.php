@@ -129,7 +129,9 @@ class OMRImage {
         //Loop to detect which pixels on a given margin are black
         //The position of this margin should idealy overlay on black strips
 
-        $sliderDir = (round($image->height()) == $axisMaxValue) ? 'x' : 'y';
+        $sliderDir = (round($image->height()) == round($axisMaxValue)) ? 'x' : 'y';
+        
+        Log::debug("slideDir : ".$sliderDir." Margin : ".$margin." Axis: ".$axisMaxValue);
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
             if ($this->stripBlackAverage($image, $i, $margin, $sliderDir) > 3) {
