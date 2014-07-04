@@ -43,13 +43,13 @@ class OMRImage {
     }
 
     private function setVariables() {
-        $this->originalHeight = $this->originalImage->height();
-        $this->originalWidth = $this->originalImage->width();
+        $this->originalHeight = round($this->originalImage->height());
+        $this->originalWidth = round($this->originalImage->width());
         $this->validateAspect();
-        $this->cellSize = $this->originalHeight / 82.7;
-        $this->tolerance = pow($this->cellSize, 2) * $this->torelanceConstant;
-        $this->xMargin = $this->marginSafety * $this->originalWidth;
-        $this->yMargin = $this->marginSafety * $this->originalHeight;
+        $this->cellSize = round($this->originalHeight / 82.7);
+        $this->tolerance = round(pow($this->cellSize, 2) * $this->torelanceConstant);
+        $this->xMargin = round($this->marginSafety * $this->originalWidth);
+        $this->yMargin = round($this->marginSafety * $this->originalHeight);
         $this->xCoord = $this->detectGridPoints($this->originalImage, $this->yMargin, $this->originalWidth);
         Log::info(count($this->xCoord) . ' X Coords detected originally', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->originalImage, $this->xMargin, $this->originalHeight);
@@ -73,10 +73,10 @@ class OMRImage {
         }
     }
 
-    private function stripBlackAverage($image, $coord, $margin, $stripLength = 5, $dir = FALSE) {
+    private function stripBlackAverage($image, $coord, $margin, $direction, $stripLength = 5) {
 
         $slider = array();
-        if ($dir ? ($dir == 'x') : ($margin != $this->xMargin)) {
+        if ($direction == 'x') {
             for ($i = 0; $i < $stripLength; $i++) {
                 $slider[$i] = $this->isBlack($image, $margin + $i, $coord);
             }
@@ -111,9 +111,11 @@ class OMRImage {
 
         //Loop to detect which pixels on a given margin are black
         //The position of this margin should idealy overlay on black strips
-
+        
+        $sliderDir = (round($image->height()) == $axisMaxValue)?'x':'y';
+                
         for ($i = 0; $i < $axisMaxValue; $i++) {
-            if ($this->stripBlackAverage($image, $i, $margin) > 3) {
+            if ($this->stripBlackAverage($image, $i, $margin,$sliderDir) > 3) {
                 $blackBooleanAxis[$i] = 1;
             } else {
                 $blackBooleanAxis[$i] = 0;
@@ -127,9 +129,9 @@ class OMRImage {
 
         $cellAverageGrid = array();
         for ($i = 0; $i < $axisMaxValue; $i++) {
-            $offset = max($i - $this->cellSize / 2, 0);
-            if ($i < $this->cellSize / 2) {
-                $length = $this->cellSize / 2 + $i;
+            $offset = max($i - round($this->cellSize / 2), 0);
+            if ($i < round($this->cellSize / 2)) {
+                $length = round($this->cellSize / 2 + $i);
             } else {
                 $length = $this->cellSize;
             }
@@ -142,7 +144,7 @@ class OMRImage {
         //Flattens out white points beyond a threshold
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
-            if ($cellAverageGrid[$i] < $this->cellSize / 2) {
+            if ($cellAverageGrid[$i] < round($this->cellSize / 2)) {
                 $cellAverageGrid[$i] = 0;
             }
         }
@@ -192,7 +194,7 @@ class OMRImage {
         $white_count = 0;
 
         for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
-            if ($this->stripBlackAverage($image, $i, $top_y - 2, 5, 'y') > 3) {
+            if ($this->stripBlackAverage($image, $i, $top_y - 2, 'y',5) > 3) {
                 $white_count = 0;
             } else {
                 $white_count = $white_count + 1;
@@ -207,7 +209,7 @@ class OMRImage {
         $white_count = 0;
         $b = array();
         for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
-            if ($this->stripBlackAverage($image, $i, $bottom_y - 2, 5, 'x') > 3) {
+            if ($this->stripBlackAverage($image, $i, $bottom_y - 2,'y',5) > 3) {
                 $white_count = 0;
             } else {
                 $white_count = $white_count + 1;
@@ -218,7 +220,10 @@ class OMRImage {
         }
         $bottom_margin = $i - 5;
 
-        $hyp = sqrt(($bottom_margin - $top_margin) * ($bottom_margin - $top_margin) + ($bottom_y - $top_y) * ($bottom_y - $top_y));
+        $hyp = sqrt(
+                ($bottom_margin - $top_margin) * ($bottom_margin - $top_margin)
+                + ($bottom_y - $top_y) * ($bottom_y - $top_y)
+                );
         $angle_radian = asin(($bottom_y - $top_y) / $hyp);
         $angle_degree = ($angle_radian / (2 * pi())) * 360;
         $rotation = 90 - $angle_degree;
