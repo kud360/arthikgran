@@ -46,12 +46,12 @@ class OMRImage {
         $this->originalHeight = round($this->originalImage->height());
         $this->originalWidth = round($this->originalImage->width());
         $this->validateAspect();
-        $this->cellSize = round($this->originalHeight / 82.7);
+        $this->cellSize = round($this->originalHeight / 210);
         $this->tolerance = round(
                 pow($this->cellSize, 2) * $this->torelanceConstant
         );
         $this->xMargin = round(
-                $this->marginSafety * $this->originalWidth * 11.3 / 8.27
+                $this->marginSafety * $this->originalWidth * 297 / 210
         );
         $this->yMargin = round(
                 $this->marginSafety * $this->originalHeight
@@ -232,8 +232,8 @@ class OMRImage {
             }
         }
         $top_margin = $i - 5;
-        
-        $white_count = 0;        
+
+        $white_count = 0;
         for ($i = $this->xMargin; $i < $image->width(); $i++) {
             if ($this->stripBlackAverage($image, $i, $bottom_y - 2, 'y', 5) > 3) {
                 $white_count = 0;
@@ -268,9 +268,12 @@ class OMRImage {
             "top_y" => $top_y
         ));
         $newImage = clone $image;
-        $newImage->rotate($rotation, 0xFFFFFF)
-                ->resizeCanvas(
-                        (int) $image->width(), (int) $image->height(), 'top-left', false, 'ffffff');
+        if ($rotation != 0) {
+            ini_set('memory_limit','512M');
+            $newImage->rotate($rotation, 0xFFFFFF)
+                    ->resizeCanvas(
+                            (int) $image->width(), (int) $image->height(), 'top-left', false, 'ffffff');
+        }
         return $newImage;
     }
 
