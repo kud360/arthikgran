@@ -193,7 +193,7 @@ class OMRImage {
 
         $white_count = 0;
 
-        for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
+        for ($i = $this->xMargin; $i < $image->height(); $i++) {
             if ($this->stripBlackAverage($image, $i, $top_y - 2, 'y',5) > 3) {
                 $white_count = 0;
             } else {
@@ -208,7 +208,7 @@ class OMRImage {
 
         $white_count = 0;
         $b = array();
-        for ($i = $this->xMargin; $i < $this->originalHeight; $i++) {
+        for ($i = $this->xMargin; $i < $image->height(); $i++) {
             if ($this->stripBlackAverage($image, $i, $bottom_y - 2,'y',5) > 3) {
                 $white_count = 0;
             } else {
@@ -229,7 +229,7 @@ class OMRImage {
         $rotation = 90 - $angle_degree;
         Log::info("Rotation : " . $rotation);
         $newImage = clone $image;
-        $newImage->rotate($rotation, 0xFFFFFF)->resizeCanvas(round($this->originalWidth,0), round($this->originalHeight,0), 'top-left', false, 'ffffff');
+        $newImage->rotate($rotation, 0xFFFFFF)->resizeCanvas((int)$image->width(), (int)$image->height(), 'top-left', false, 'ffffff');
         return $newImage;
     }
 
