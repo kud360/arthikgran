@@ -251,7 +251,7 @@ class OMRImage {
             if ($white_count == 5) {
                 if ($i)
                     break;
-            }F
+            }
         }
         $bottom_margin = $i - 5;
 
