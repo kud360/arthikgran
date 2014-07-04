@@ -269,7 +269,7 @@ class OMRImage {
                 $draw->color('#555');
             });
         }
-        foreach ($this->xCoord as $point) {
+        foreach ($this->yCoord as $point) {
             $image->line(0, $point, (int) $image->width(), $point, function ($draw) {
                 $draw->color('#555');
             });
