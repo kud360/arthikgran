@@ -219,7 +219,7 @@ class OMRImage {
                 if ($this->stripBlackAverage($image, $i, $top_y - 4, 'y', 5) > 3) {
                     $top_y-=2;
                     $white_count = 0;
-                } elseif ($this->stripBlackAverage($image, $i, $top_y, 'y', 5) < 3) {
+                } elseif ($this->stripBlackAverage($image, $i, $top_y, 'y', 5) > 3) {
                     $top_y+=2;
                     $white_count = 0;
                 } else {
@@ -241,7 +241,7 @@ class OMRImage {
                 if ($this->stripBlackAverage($image, $i, $bottom_y - 4, 'y', 5) > 3) {
                     $bottom_y-=2;
                     $white_count = 0;
-                } elseif ($this->stripBlackAverage($image, $i, $bottom_y, 'y', 5) < 3) {
+                } elseif ($this->stripBlackAverage($image, $i, $bottom_y, 'y', 5) > 3) {
                     $bottom_y+=2;
                     $white_count = 0;
                 } else {
