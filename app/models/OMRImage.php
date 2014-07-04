@@ -51,10 +51,10 @@ class OMRImage {
                 pow($this->cellSize, 2) * $this->torelanceConstant
         );
         $this->xMargin = round(
-                $this->marginSafety * $this->originalWidth
+                $this->marginSafety * $this->originalWidth * 11.3 / 8.27
         );
         $this->yMargin = round(
-                $this->marginSafety * $this->originalHeight * 11.3 / 8.27
+                $this->marginSafety * $this->originalHeight
         );
         $this->xCoord = $this->detectGridPoints(
                 $this->originalImage, $this->yMargin, $this->originalWidth
