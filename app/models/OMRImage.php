@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -114,7 +114,7 @@ class OMRImage {
 
             //Log::info('rgb value: ',array("rgb" => $rgb));
 
-            if ($rgb[0] < 50 && $rgb[1] < 50 && $rgb[2] < 50) {
+            if ($rgb[0] < 150 && $rgb[1] < 150 && $rgb[2] < 150) {
                 return 1;
             } else {
                 return 0;
