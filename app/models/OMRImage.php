@@ -78,7 +78,7 @@ class OMRImage {
     private function validateAspect() {
 
         $aspectRatio = $this->originalWidth / $this->originalHeight;
-        if ($aspectRatio > 0.704 && $aspectRatio < 0.712) {
+        if ($aspectRatio > 0.704 && $aspectRatio < 0.732) {
             Log::info('Aspect ratio validates A4 compliance.');
             Log::info('Image DPI detected: ' .
                     ($this->originalWidth / 8.27) .
