@@ -28,7 +28,7 @@ class QuickController extends BaseController {
             return Redirect::to('quick/single')->withErrors($validator);
         }   else    {
             $omr = OMRImage::make(Image::make(Input::file('image')));            
-            return View::make('quickresult')>withImage($omr->image());
+            return View::make('quickresult')>with('image',$omr->image());
         }                
     }
 
