@@ -23,8 +23,7 @@ class OMRImage {
     private $marginSafety = 0.06;
     private $torelanceConstant = 0.7;
     private $yCoord;
-    private $xCoord;
-    private $optimizedImage;
+    private $xCoord;    
 
     public static function make($image) {
 
@@ -39,7 +38,7 @@ class OMRImage {
     }
 
     public function image() {
-        return $this->optimizedImage;
+        return $this->originalImage;
     }
 
     private function setVariables() {
@@ -64,13 +63,13 @@ class OMRImage {
                 $this->originalImage, $this->xMargin, $this->originalHeight
         );
         Log::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
-        $this->optimizedImage = $this->correctSkew($this->originalImage);
+        $this->originalImage = $this->correctSkew($this->originalImage);
         $this->xCoord = $this->detectGridPoints(
-                $this->optimizedImage, $this->yMargin, $this->originalWidth
+                $this->originalImage, $this->yMargin, $this->originalWidth
         );
         Log::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints(
-                $this->optimizedImage, $this->xMargin, $this->originalHeight
+                $this->originalImage, $this->xMargin, $this->originalHeight
         );
         Log::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
     }
@@ -266,20 +265,19 @@ class OMRImage {
             "bottom_y" => $bottom_y,
             "top_x" => $top_margin,
             "top_y" => $top_y
-        ));
-        $newImage = clone $image;
+        ));        
         if (abs($rotation) > 0.05) {            
-            $newImage->rotate($rotation, 0xFFFFFF)
+            $image->rotate($rotation, 0xFFFFFF)
                     ->resizeCanvas(
-                            (int) $image->width(), (int) $image->height(), 'top-left', false, 'ffffff');
+                            (int) $this->originalWidth, (int) $this->originalHeight(), 'center', false, 'ffffff');
         }
-        return $newImage;
+        return $image;
     }
 
     public function debugImage() {        
-        $this->drawGuides($this->optimizedImage);
-        $this->drawMargins($this->optimizedImage);
-        return $this->optimizedImage;
+        $this->drawGuides($this->originalImage);
+        $this->drawMargins($this->originalImage);
+        return $this->originalImage;
     }
 
     private function drawGuides($image) {
