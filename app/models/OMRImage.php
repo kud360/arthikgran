@@ -276,11 +276,10 @@ class OMRImage {
         return $newImage;
     }
 
-    public function debugImage() {
-        $debugImage = clone $this->optimizedImage;
-        $this->drawGuides($debugImage);
-        $this->drawMargins($debugImage);
-        return $debugImage;
+    public function debugImage() {        
+        $this->drawGuides($this->optimizedImage);
+        $this->drawMargins($this->optimizedImage);
+        return $this->optimizedImage;
     }
 
     private function drawGuides($image) {
