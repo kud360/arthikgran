@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -13,107 +13,98 @@
  */
 class OMRImage {
 
-    private $originalHeight;
-    private $originalWidth;
-    private $originalImage;
+    private $image;
     private $cellSize;
+    private $dpi;
     private $tolerance;
     private $xMargin;
     private $yMargin;
-    private $marginSafety = 0.06;
-    private $torelanceConstant = 0.7;
+    private $marginSafety = 0.5;
+    private $torelanceConstant = 0.2;
     private $yCoord;
-    private $xCoord;    
+    private $xCoord;
+    private $grid;
+    private $GDObj;
+    private $maxX, $maxY;
 
-    public static function make($image) {
-
-        $newImage = new OMRImage();
-        $newImage->originalImage = $image;
-        $newImage->setVariables();
-        return $newImage;
+    public function __call($method_name, $args) {
+        if (method_exists($this->image, $method_name)) {
+            return call_user_func_array(array($this->image, $method_name), $args);
+        } else {
+            return call_user_func_array(array($this->image, $method_name), $args);
+        }
     }
 
-    public function printDetails() {
-        var_dump($this);
+    public function __construct($file) {
+        $this->image = Image::make($file);
+        return $this;
     }
 
-    public function image() {
-        return $this->originalImage;
-    }
-
-    private function setVariables() {
-        $this->originalHeight = round($this->originalImage->height());
-        $this->originalWidth = round($this->originalImage->width());
+    public function prepare() {
+        $this->greyscale();
+        $this->blur(20);
+        $this->contrast(40);
         $this->validateAspect();
-        $this->cellSize = round($this->originalHeight / 210);
+        $this->maxX = $this->image->width();
+        $this->maxY = $this->image->height();
+        $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
+        $this->cellSize = ($this->dpi) / 10;
         $this->tolerance = round(
-                pow($this->cellSize, 2) * $this->torelanceConstant
+                pow($this->cellSize, 2) * $this->torelanceConstant / 4
         );
-        $this->xMargin = round(
-                $this->marginSafety * $this->originalWidth * 297 / 210
-        );
-        $this->yMargin = round(
-                $this->marginSafety * $this->originalHeight
-        );
-        $this->xCoord = $this->detectGridPoints(
-                $this->originalImage, $this->yMargin, $this->originalWidth
-        );
+        $this->xMargin = round($this->marginSafety * $this->dpi);
+        $this->yMargin = round($this->marginSafety * $this->dpi);
+        $this->GDObj = $this->image->getCore();
+        $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
         Log::info(count($this->xCoord) . 'XCoords detected', $this->xCoord);
-        $this->yCoord = $this->detectGridPoints(
-                $this->originalImage, $this->xMargin, $this->originalHeight
-        );
+        $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
         Log::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
-        $this->originalImage = $this->correctSkew($this->originalImage);
-        $this->xCoord = $this->detectGridPoints(
-                $this->originalImage, $this->yMargin, $this->originalWidth
-        );
+        $this->correctRotation();
+        $this->GDObj = $this->image->getCore();
+        $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
         Log::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
-        $this->yCoord = $this->detectGridPoints(
-                $this->originalImage, $this->xMargin, $this->originalHeight
-        );
+        $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
         Log::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
+        $this->parseGrid();
+        Log::info('Grid Parsed', $this->grid);
+        return $this;
     }
 
     private function validateAspect() {
 
-        $aspectRatio = $this->originalWidth / $this->originalHeight;
+        $aspectRatio = $this->image->width() / $this->image->height();
         if ($aspectRatio > 0.704 && $aspectRatio < 0.732) {
             Log::info('Aspect ratio validates A4 compliance.');
             Log::info('Image DPI detected: ' .
-                    ($this->originalWidth / 8.27) .
+                    ($this->width() / 8.27) .
                     'X' .
-                    ($this->originalHeight / 11.7));
+                    ($this->height() / 11.7));
         } else {
             Log::error('Aspect ratio out of bounds for A4 limits');
-            throw new Exception;
         }
     }
 
-    private function stripBlackAverage($image, $coord, $margin, $direction, $stripLength = 5) {
+    private function stripBlackAverage($coord, $margin, $direction, $stripLength = 5) {
 
         $slider = array();
         if ($direction == 'x') {
             for ($i = 0; $i < $stripLength; $i++) {
-                $slider[$i] = $this->isBlack($image, $margin + $i, $coord);
+                $slider[$i] = $this->isBlack($margin + $i, $coord);
             }
         } else {
             for ($i = 0; $i < $stripLength; $i++) {
-                $slider[$i] = $this->isBlack($image, $coord, $margin + $i);
+                $slider[$i] = $this->isBlack($coord, $margin + $i);
             }
         }
         return array_sum($slider);
     }
 
-    private function isBlack($image, $x, $y) {
+    private function isBlack($x, $y) {
 
-        if ($x < 0 || $y < 0 || $x >= $image->width() || $y >= $image->height()) {
+        if ($x < 0 || $y < 0 || $x >= $this->maxX || $y >= $this->maxY) {
             return 0;
         } else {
-            $rgb = $image->pickColor((int) $x, (int) $y);
-
-            //Log::info('rgb value: ',array("rgb" => $rgb));
-
-            if ($rgb[0] < 150 && $rgb[1] < 150 && $rgb[2] < 150) {
+            if ((imagecolorat($this->GDObj, (int) $x, (int) $y) & 0xFF) < 150) {
                 return 1;
             } else {
                 return 0;
@@ -121,19 +112,19 @@ class OMRImage {
         }
     }
 
-    private function detectGridPoints($image, $margin, $axisMaxValue) {
+    private function detectGridPoints($margin, $axisMaxValue) {
 
         $blackBooleanAxis = array();
 
         //Loop to detect which pixels on a given margin are black
         //The position of this margin should idealy overlay on black strips
 
-        $sliderDir = (round($image->height()) == round($axisMaxValue)) ? 'x' : 'y';
+        $sliderDir = (round($this->image->height()) == round($axisMaxValue)) ? 'x' : 'y';
 
         Log::debug("slideDir : " . $sliderDir . " Margin : " . $margin . " Axis: " . $axisMaxValue);
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
-            if ($this->stripBlackAverage($image, $i, $margin, $sliderDir) > 3) {
+            if ($this->stripBlackAverage($i, $margin, $sliderDir) > 3) {
                 $blackBooleanAxis[$i] = 1;
             } else {
                 $blackBooleanAxis[$i] = 0;
@@ -204,21 +195,21 @@ class OMRImage {
         return $stripCoords;
     }
 
-    public function correctSkew($image) {
+    public function correctRotation() {
 
         $top_y = $this->yCoord[0];
         $bottom_y = $this->yCoord[count($this->yCoord) - 1];
 
         $white_count = 0;
 
-        for ($i = $this->xMargin; $i < $image->width(); $i++) {
-            if ($this->stripBlackAverage($image, $i, $top_y - 2, 'y', 5) > 3) {
+        for ($i = $this->xMargin; $i < $this->image->width(); $i++) {
+            if ($this->stripBlackAverage($i, $top_y - 2, 'y', 5) > 3) {
                 $white_count = 0;
             } else {
-                if ($this->stripBlackAverage($image, $i, $top_y - 4, 'y', 5) > 3) {
+                if ($this->stripBlackAverage($i, $top_y - 4, 'y', 5) > 3) {
                     $top_y-=2;
                     $white_count = 0;
-                } elseif ($this->stripBlackAverage($image, $i, $top_y, 'y', 5) > 3) {
+                } elseif ($this->stripBlackAverage($i, $top_y, 'y', 5) > 3) {
                     $top_y+=2;
                     $white_count = 0;
                 } else {
@@ -226,21 +217,20 @@ class OMRImage {
                 }
             }
             if ($white_count == 5) {
-                if ($i)
-                    break;
+                break;
             }
         }
         $top_margin = $i - 5;
 
         $white_count = 0;
-        for ($i = $this->xMargin; $i < $image->width(); $i++) {
-            if ($this->stripBlackAverage($image, $i, $bottom_y - 2, 'y', 5) > 3) {
+        for ($i = $this->xMargin; $i < $this->image->width(); $i++) {
+            if ($this->stripBlackAverage($i, $bottom_y - 2, 'y', 5) > 3) {
                 $white_count = 0;
             } else {
-                if ($this->stripBlackAverage($image, $i, $bottom_y - 4, 'y', 5) > 3) {
+                if ($this->stripBlackAverage($i, $bottom_y - 4, 'y', 5) > 3) {
                     $bottom_y-=2;
                     $white_count = 0;
-                } elseif ($this->stripBlackAverage($image, $i, $bottom_y, 'y', 5) > 3) {
+                } elseif ($this->stripBlackAverage($i, $bottom_y, 'y', 5) > 3) {
                     $bottom_y+=2;
                     $white_count = 0;
                 } else {
@@ -248,8 +238,7 @@ class OMRImage {
                 }
             }
             if ($white_count == 5) {
-                if ($i)
-                    break;
+                break;
             }
         }
         $bottom_margin = $i - 5;
@@ -265,39 +254,87 @@ class OMRImage {
             "bottom_y" => $bottom_y,
             "top_x" => $top_margin,
             "top_y" => $top_y
-        ));        
-        if (abs($rotation) > 0.1) {                        
-            $image->rotate($rotation, 0xFFFFFF)
-                    ->resizeCanvas(
-                            (int) $this->originalWidth, (int) $this->originalHeight, 'center', false, 'ffffff');            
+        ));
+
+        $this->image->circle(20, $bottom_margin, $bottom_y, function ($draw) {
+            $draw->background('#0000ff');
+            $draw->border(1, '#f00');
+        });
+
+        $this->image->circle(20, $top_margin, $top_y, function ($draw) {
+            $draw->background('#0000ff');
+            $draw->border(1, '#f00');
+        });
+
+        $height = $this->height();
+        $width = $this->width();
+
+        $this->image->rotate($rotation, 0xFFFFFF)
+                ->resizeCanvas(
+                        $this->maxX, $this->maxY, 'center', false, 'ffffff');
+
+        return $this;
+    }
+
+    private function parseGrid() {
+        $this->grid = array();
+        foreach ($this->xCoord as $row => $x) {
+            array_push($this->grid, array());
+            foreach ($this->yCoord as $column => $y) {
+                array_push($this->grid[$row], $this->isBlackDot($x, $y));
+            }
         }
-        return $image;
     }
 
-    public function debugImage() {        
-        $this->drawGuides($this->originalImage);
-        $this->drawMargins($this->originalImage);
-        return $this->originalImage;
+    private function isBlackDot($x, $y) {
+        $counter = 0;
+        $minX = round($x - $this->cellSize / 4);
+        $maxX = round($x + $this->cellSize / 4);
+        $minY = round($y - $this->cellSize / 4);
+        $maxY = round($y + $this->cellSize / 4);
+        for ($i = $minX; $i < $maxX; $i++) {
+            for ($j = $minY; $j < $maxY; $j++) {
+                if ($this->isBlack($i, $j)) {
+                    $counter++;
+                }
+            }
+        }
+        if ($counter > $this->tolerance) {
+            $this->image->rectangle(
+                    $minX, $minY, $maxX, $maxY, function ($draw) {
+                $draw->background('#0000ff');
+                $draw->border(1, '#f00');
+            });
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
 
-    private function drawGuides($image) {
+    public function debugImage() {
+        $this->drawGuides();
+        $this->drawMargins();
+        return $this;
+    }
+
+    private function drawGuides() {
         foreach ($this->xCoord as $point) {
-            $image->line($point, 0, $point, (int) $image->height(), function ($draw) {
+            $this->image->line($point, 0, $point, (int) $this->image->height(), function ($draw) {
                 $draw->color('#555');
             });
         }
         foreach ($this->yCoord as $point) {
-            $image->line(0, $point, (int) $image->width(), $point, function ($draw) {
+            $this->image->line(0, $point, (int) $this->image->width(), $point, function ($draw) {
                 $draw->color('#555');
             });
         }
     }
 
-    private function drawMargins($image) {
-        $image->line($this->xMargin, 0, $this->xMargin, $this->originalHeight, function ($draw) {
+    private function drawMargins() {
+        $this->image->line($this->xMargin, 0, $this->xMargin, $this->image->height(), function ($draw) {
             $draw->color('#eee');
         });
-        $image->line(0, $this->yMargin, $this->originalWidth, $this->yMargin, function ($draw) {
+        $this->image->line(0, $this->yMargin, $this->image->width(), $this->yMargin, function ($draw) {
             $draw->color('#eee');
         });
     }
