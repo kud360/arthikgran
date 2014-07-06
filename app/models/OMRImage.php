@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -78,7 +78,7 @@ class OMRImage {
     private function validateAspect() {
 
         $aspectRatio = $this->originalWidth / $this->originalHeight;
-        if ($aspectRatio > 0.704 && $aspectRatio < 0.712) {
+        if ($aspectRatio > 0.704 && $aspectRatio < 0.732) {
             Log::info('Aspect ratio validates A4 compliance.');
             Log::info('Image DPI detected: ' .
                     ($this->originalWidth / 8.27) .
@@ -114,7 +114,7 @@ class OMRImage {
 
             //Log::info('rgb value: ',array("rgb" => $rgb));
 
-            if ($rgb[0] < 50 && $rgb[1] < 50 && $rgb[2] < 50) {
+            if ($rgb[0] < 150 && $rgb[1] < 150 && $rgb[2] < 150) {
                 return 1;
             } else {
                 return 0;
