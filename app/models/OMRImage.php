@@ -266,10 +266,10 @@ class OMRImage {
             "top_x" => $top_margin,
             "top_y" => $top_y
         ));        
-        if (abs($rotation) > 0.05) {            
+        if (abs($rotation) > 0.1) {            
             $image->rotate($rotation, 0xFFFFFF)
                     ->resizeCanvas(
-                            (int) $this->originalWidth, (int) $this->originalHeight(), 'center', false, 'ffffff');
+                            (int) $this->originalWidth, (int) $this->originalHeight, 'center', false, 'ffffff');
         }
         return $image;
     }
