@@ -22,6 +22,10 @@ Route::get('/phpinfo', function()
 	return 1;
 });
 
+Route::post('/upload',array('as'=>'upload','uses'=>'UploadController@index'));
+
+Route::get('/upload',array('uses'=>'UploadController@showForm'));
+
 Route::get('/quick/single', 'QuickController@single');
 
 Route::post('/quick/single', 'QuickController@parseSingle');
