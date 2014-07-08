@@ -113,7 +113,7 @@ and open the template in the editor.
                 </div>
                 <div class="tab-pane" id="answers">
                     <blockquote>
-                        <h3>Correct Answers<small>This section becomes disabled once checking has begun.</small></h3>
+                        <h3>Results<small>This section becomes disabled once checking has begun.</small></h3>
                         <p>
                             Click the appropriate button representing the correct answer besides to the corresponding question number
                         </p>
@@ -182,13 +182,15 @@ and open the template in the editor.
                                 correct.push($(this).text().trim());
                             }
                         });
-                        if (data.loaded = data.total) {
+                        if (data.loaded > 0) {
                             $("#statusText").text("Uploading " + data.files[0].name);
                         }
                     },
                     progress: function(e, data) {
                         if (data.loaded == data.total) {
                             $("#statusText").text("Interpreting " + data.files[0].name);
+                        }   else    {
+                            $("#statusText").text("Uploading " + data.files[0].name);                            
                         }
 
                     },
@@ -199,6 +201,7 @@ and open the template in the editor.
                                 'width',
                                 progress + '%'
                                 );
+                        $('#progress .progress-bar').text(progress + ' %');
                     }
                 }).prop('disabled', !$.support.fileInput)
                         .parent().addClass($.support.fileInput ? undefined : 'disabled');
