@@ -187,7 +187,7 @@ and open the template in the editor.
                         }
                     },
                     progress: function(e, data) {
-                        if (data.loaded = data.total) {
+                        if (data.loaded == data.total) {
                             $("#statusText").text("Interpreting " + data.files[0].name);
                         }
 
