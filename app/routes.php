@@ -39,7 +39,7 @@ Route::post('/test', function() {
 });
 
 Route::post('/parse', function() {
-
+    
     if (Input::hasFile('files')) {
         $all_uploads = Input::file('files');
 
