@@ -34,6 +34,10 @@ $(function() {
             console.log(data);
             $("#statusText").text('File ' + data.files[0].name + " interpreted Successfully");
             publishResult(data.result.grid);
+            var progress = $('#fileupload').fileupload('progress');
+            if (progress.loaded == progress.total) {
+                $(".progress-bar").removeClass('progress-bar-warning').addClass('progress-bar-success')
+            }
         },
         start: function(e, data) {
             $('#answers label.active').addClass('btn-success')
@@ -49,26 +53,20 @@ $(function() {
                     correct[set].push($(this).text().trim());
                 }
             });
-            console.log(correct);
-            if (data.loaded > 0) {
-                $("#statusText").text("Uploading " + data.files[0].name);
-            }
         },
         progress: function(e, data) {
             if (data.loaded == data.total) {
                 $("#statusText").text("Interpreting " + data.files[0].name + ". This can take upto a minute ...");
+                $(".progress-bar").removeClass('progress-bar-info').addClass('progress-bar-warning')
             } else {
                 $("#statusText").text("Uploading " + data.files[0].name);
+                $(".progress-bar").removeClass('progress-bar-warning').addClass('progress-bar-info')
             }
 
         },
         progressall: function(e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);
-
-            $('#progress .progress-bar').css(
-                    'width',
-                    progress + '%'
-                    );
+            $('#progress .progress-bar').css('width', progress + '%');
             $('#progress .progress-bar').text(progress + ' %');
         }
     }).prop('disabled', !$.support.fileInput)
@@ -178,7 +176,7 @@ function getMarks(grid) {
     var columnsPerAnswer = 6;
     var startColumn = 1;
     var startRow = 39;
-    var marks = 0;    
+    var marks = 0;
 
     for (var i = startRow; i < startRow + answersInAColumn * rowsPerAnswer; i += rowsPerAnswer) {
 
@@ -215,14 +213,14 @@ function publishResult(grid) {
     var pass = (marks > 19) ? 1 : 0;
     var $row = $('<tr></tr>');
     $row.append($('<td></td>').append(srno));
-    $row.append($('<td></td>').append('<b>'+name+'</b>'));
+    $row.append($('<td></td>').append('<b>' + name + '</b>'));
     $row.append($('<td></td>').append(div));
     $row.append($('<td></td>').append(roll));
-    $row.append($('<td></td>').append(marks));    
+    $row.append($('<td></td>').append(marks));
     if (pass) {
         $row.addClass('success');
         $row.append($('<td></td>').append('<span class="label label-success">Pass</span>'));
-        
+
     } else {
         $row.addClass('danger')
         $row.append($('<td></td>').append('<span class="label label-danger">Fail</span>'));

@@ -55,7 +55,7 @@ and open the template in the editor.
             <!-- The global progress bar -->
             <div class="row">
                 <div id="progress" class="progress">
-                    <div class="progress-bar progress-bar-info progress-bar-striped"></div>
+                    <div class="progress-bar progress-bar-info"></div>
                 </div>
             </div>
 
@@ -280,7 +280,7 @@ and open the template in the editor.
                 <div class="tab-pane" id="links">
                     <blockquote>
                         <p>Sample Answer Sheet: 
-                            <a href='OMR_Format.pdf'></a>
+                            <a href='OMR_Format.pdf'>Click Here to download empty answer sheet.</a>
                         </p>
                         
                     </blockquote>                    
