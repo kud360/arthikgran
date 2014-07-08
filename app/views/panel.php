@@ -279,7 +279,10 @@ and open the template in the editor.
                 </div>                
                 <div class="tab-pane" id="links">
                     <blockquote>
-                        <p>Links to answer sheet pdf and other documents</p>
+                        <p>Sample Answer Sheet: 
+                            <a href='OMR_Format.pdf'></a>
+                        </p>
+                        
                     </blockquote>                    
                 </div>                
             </div>            

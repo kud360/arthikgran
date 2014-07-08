@@ -170,15 +170,15 @@ function getDiv(grid) {
 
 function getMarks(grid) {
 
-    var noOfAnswers = correct.length;
+    var set = getSet(grid)
+    var noOfAnswers = correct[set].length;
     var answersInARow = 5;
     var answersInAColumn = Math.ceil(noOfAnswers / answersInARow);
     var rowsPerAnswer = 1;
     var columnsPerAnswer = 6;
     var startColumn = 1;
     var startRow = 39;
-    var marks = 0;
-    var set = getSet(grid)
+    var marks = 0;    
 
     for (var i = startRow; i < startRow + answersInAColumn * rowsPerAnswer; i += rowsPerAnswer) {
 
@@ -212,18 +212,20 @@ function publishResult(grid) {
     var roll = getRollNo(grid);
     var div = getDiv(grid);
     var srno = $("#resultTable tr").length;
-    var pass = (marks > 19) ? "Pass" : "Fail";
+    var pass = (marks > 19) ? 1 : 0;
     var $row = $('<tr></tr>');
     $row.append($('<td></td>').append(srno));
-    $row.append($('<td></td>').append(name));
+    $row.append($('<td></td>').append('<b>'+name+'</b>'));
     $row.append($('<td></td>').append(div));
     $row.append($('<td></td>').append(roll));
-    $row.append($('<td></td>').append(marks));
-    $row.append($('<td></td>').append(pass));
-    if (pass == "Pass") {
-        $row.addClass('success')
+    $row.append($('<td></td>').append(marks));    
+    if (pass) {
+        $row.addClass('success');
+        $row.append($('<td></td>').append('<span class="label label-success">Pass</span>'));
+        
     } else {
         $row.addClass('danger')
+        $row.append($('<td></td>').append('<span class="label label-danger">Fail</span>'));
     }
 
     $("#resultTable").append($row);
