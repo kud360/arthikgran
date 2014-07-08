@@ -188,7 +188,7 @@ and open the template in the editor.
                     },
                     progress: function(e, data) {
                         if (data.loaded == data.total) {
-                            $("#statusText").text("Interpreting " + data.files[0].name". This can take upto a minute ...");
+                            $("#statusText").text("Interpreting " + data.files[0].name + ". This can take upto a minute ...");
                         }   else    {
                             $("#statusText").text("Uploading " + data.files[0].name);                            
                         }
