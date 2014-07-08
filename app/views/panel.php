@@ -36,37 +36,6 @@ and open the template in the editor.
         <div class="container">
             <h1>OMR Answer Sheet Interpretation System (O.A.S.I.S.)</h1>
             <h2 class="lead">Version 1.0</h2>
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="active"><a href="#instructions" role="tab" data-toggle="tab">Instructions</a></li>
-                <li><a href="#result" role="tab" data-toggle="tab">Result</a></li>
-                <li><a href="#answers" role="tab" data-toggle="tab">Correct Answers</a></li>
-                <li><a href="#links" role="tab" data-toggle="tab">Links</a></li>                
-            </ul>
-
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <div class="tab-pane active" id="instructions">
-                    <blockquote>
-                        <p>Some Instruction Text</p>
-                    </blockquote>
-                </div>
-                <div class="tab-pane" id="result">
-                    <blockquote>
-                        <p>Result Table</p>
-                    </blockquote>                    
-                </div>
-                <div class="tab-pane" id="answers">
-                    <blockquote>
-                        <p>Grid for Entering Correct Answers</p>
-                    </blockquote>                    
-                </div>                
-                <div class="tab-pane" id="links">
-                    <blockquote>
-                        <p>Links to answer sheet pdf and other documents</p>
-                    </blockquote>                    
-                </div>                
-            </div>
 
             <div class="row">
                 <!-- The fileinput-button span is used to style the file input field as button -->
@@ -95,6 +64,85 @@ and open the template in the editor.
 
             <!-- The container for the uploaded files -->
             <div id="files" class="files"></div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#instructions" role="tab" data-toggle="tab">Instructions</a></li>
+                <li><a href="#result" role="tab" data-toggle="tab">Result</a></li>
+                <li><a href="#answers" role="tab" data-toggle="tab">Correct Answers</a></li>
+                <li><a href="#links" role="tab" data-toggle="tab">Links</a></li>                
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="instructions">
+                    <blockquote>
+                        <p>Some Instruction Text</p>
+                    </blockquote>
+                </div>
+                <div class="tab-pane" id="result">
+                    <blockquote>
+                        <h3>Correct Answers<small>The result table in this section will be filled up as and when the answer sheets are corrected.</small></h3>
+                        <p class="lead">Result Table</p>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>
+                                        Sr. No.
+                                    </th>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Division
+                                    </th>
+                                    <th>
+                                        Roll Number
+                                    </th>
+                                    <th>
+                                        Marks
+                                    </th>
+                                    <th>
+                                        Pass / Fail
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
+                    </blockquote>                    
+                </div>
+                <div class="tab-pane" id="answers">
+                    <blockquote>
+                        <h3>Correct Answers<small>This section becomes disabled once checking has begun.</small></h3>
+                        <p>
+                            Click the appropriate button representing the correct answer besides to the corresponding question number
+                        </p>
+                        <div class="hidden well-lg">
+                            <div class="well well-sm col-lg-2">
+                                <span class="badge">1</span>&nbsp;
+                                <div class="btn-group" data-toggle="buttons">                            
+                                    <label class="btn btn-default btn-sm">
+                                        <input type="radio" name="options" value="A">A
+                                    </label>
+                                    <label class="btn btn-default btn-sm">
+                                        <input type="radio" name="options" value="B">B
+                                    </label>
+                                    <label class="btn btn-default btn-sm">
+                                        <input type="radio" name="options" value="C">C
+                                    </label>
+                                    <label class="btn btn-default btn-sm">
+                                        <input type="radio" name="options" value="D">D
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </blockquote>                    
+                </div>                
+                <div class="tab-pane" id="links">
+                    <blockquote>
+                        <p>Links to answer sheet pdf and other documents</p>
+                    </blockquote>                    
+                </div>                
+            </div>            
         </div>
         <script src="js/jquery.min.js"></script>        
         <script src="js/vendor/jquery.ui.widget.js"></script>        
@@ -102,6 +150,14 @@ and open the template in the editor.
         <script src="js/jquery.fileupload.js"></script>        
         <script src="js/bootstrap.min.js"></script>
         <script>
+
+            var defaultCorrect = [
+                'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D',
+                'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D',
+                'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A'
+            ];
+            var correct = [];
+
             /*jslint unparam: true */
             /*global window, $ */
             $(function() {
@@ -112,11 +168,22 @@ and open the template in the editor.
                     dataType: 'json',
                     sequentialUploads: true,
                     done: function(e, data) {
-                        $.each(data.files, function(index, file) {
-                            $("#statusText").text('File ' + data.files[0].name + " interpreted Successfully")
-                        });
+                        console.log(data);
+                        $("#statusText").text('File ' + data.files[0].name + " interpreted Successfully")
+                        alert(getName(data.result.grid));
+                        alert(getResult(data.result.grid));                        
+
                     },
                     start: function(e, data) {
+                        $('#answers label.active').addClass('btn-success')
+                        $('#answers label').addClass('disabled');
+                        $('#answers label').each(function(index, elem) {
+                            $(this).addClass('disabled');
+                            if ($(this).hasClass('active')) {
+                                $(this).addClass('btn-success')
+                                correct.push($(this).text().trim());
+                            }
+                        })
                         if (data.loaded = data.total) {
                             $("#statusText").text("Uploading " + data.files[0].name);
                         }
@@ -129,6 +196,7 @@ and open the template in the editor.
                     },
                     progressall: function(e, data) {
                         var progress = parseInt(data.loaded / data.total * 100, 10);
+
                         $('#progress .progress-bar').css(
                                 'width',
                                 progress + '%'
@@ -136,7 +204,89 @@ and open the template in the editor.
                     }
                 }).prop('disabled', !$.support.fileInput)
                         .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
+                $("#answers .hidden").each(function() {
+                    var $entry = $('.well', this).clone();
+                    $('.well', this).remove();
+                    for (var i = 0; i < defaultCorrect.length; i++) {
+                        if (i % 5 === 0) {
+                            $(this).append('<div class="row">');
+                        }
+                        $(this).children('.row:last').append($entry.clone());
+                        $('.row:last .well:last .badge', this).text(i + 1);
+                        $('.row:last .well:last input[value=' + defaultCorrect[i] + ']', this).click();
+
+                    }
+                    $(this).removeClass('hidden');
+                })
             });
+
+            function getName(grid) {
+                var name = "";
+                var startRow = 2;
+                var EndRow = startRow + 26
+                var startColumn = 0;
+                var EndColumn = grid.length - 1;
+                var i,j
+
+                for (j = startColumn; j < EndColumn; j++) {
+                    for (i = startRow; i < EndRow; i++) {
+                        if(grid[j][i])  {
+                            name += String.fromCharCode(65 + i - startRow);
+                            break;
+                        }
+                    }
+                    if(i===EndRow)   {
+                        name += ' ';
+                    }                    
+                }
+                
+                console.log(name);
+                return name;
+            }
+
+            function getResult(grid) {
+
+                var noOfAnswers = correct.length;
+                var answersInARow = 5;
+                var answersInAColumn = Math.ceil(noOfAnswers / answersInARow);
+                var rowsPerAnswer = 1;
+                var columnsPerAnswer = 6;
+                var startColumn = 1;
+                var startRow = 39;
+
+                var marks = 0;
+
+                console.log(correct);
+
+                for (var i = startRow; i < startRow + answersInAColumn * rowsPerAnswer; i += rowsPerAnswer) {
+
+                    for (var j = startColumn; j < columnsPerAnswer * answersInARow; j += columnsPerAnswer) {
+
+                        var questionNo = ((j - startColumn) / columnsPerAnswer) * answersInAColumn + ((i - startRow) / rowsPerAnswer);
+
+                        if (questionNo <= noOfAnswers) {
+                            var option = '';
+
+                            option += (grid[j][i]) ? 'A' : '';
+                            option += (grid[j + 1][i]) ? 'B' : '';
+                            option += grid[j + 2][i] ? 'C' : '';
+                            option += grid[j + 3][i] ? 'D' : '';
+
+                            console.log(questionNo + ' ( ' + i + ',' + j + ' ) : ' + option);
+
+                            if (option.length == 1) {
+                                if (correct[questionNo] == option)
+                                    marks += 1;
+                            }
+                        }
+                    }
+                }
+
+                return marks;
+            }
+
+
         </script>
     </body>    
 </html>

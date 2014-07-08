@@ -63,7 +63,7 @@ Route::post('/parse', function() {
 
             if ($validator->passes()) {
                 $omr = new OMRImage($upload);
-                return Response::json(array("files" => array($upload->getClientOriginalName()), "parsed" => $omr->prepare()->getGrid()));
+                return Response::json(array("files" => array($upload->getClientOriginalName()), "grid" => $omr->prepare()->getGrid()));
             } else {
                 // Collect error messages
                 $error_messages[] = 'File "' . $upload->getClientOriginalName() . '":' . $validator->messages()->first('file');
