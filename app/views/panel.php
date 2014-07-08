@@ -145,7 +145,7 @@ and open the template in the editor.
             </div>            
         </div>
         <script src="js/jquery.min.js"></script>        
-        <script src="js/vendor/jquery.ui.widget.js"></script>        
+        <script src="js/jquery.ui.widget.js"></script>        
         <script src="js/jquery.iframe-transport.js"></script>        
         <script src="js/jquery.fileupload.js"></script>        
         <script src="js/bootstrap.min.js"></script>
@@ -239,10 +239,17 @@ and open the template in the editor.
                     if(i===EndRow)   {
                         name += ' ';
                     }                    
-                }
+                }                
                 
-                console.log(name);
-                return name;
+                return name.trim();
+            }
+            
+            function getRollNo()    {
+                
+            }
+            
+            function getDiv()   {
+                
             }
 
             function getResult(grid) {
