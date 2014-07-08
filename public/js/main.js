@@ -15,28 +15,16 @@ $(function() {
     'use strict';
 
     // Initialize the jQuery File Upload widget:
-    $('#fileupload').fileupload({
-        // Uncomment the following to send cross-domain cookies:
-        //xhrFields: {withCredentials: true},
-        url: 'upload'
-    });
-
-    // Enable iframe cross-domain access via redirect option:
-    $('#fileupload').fileupload(
-            'option',
-            'redirect',
-            window.location.href.replace(
-                    /\/[^\/]*$/,
-                    '/cors/result.html?%s'
-                    )
-            );
-
+    $('#fileupload').fileupload({    
+        url: 'parse',
+        sequentialUploads: true,
+        dataType: 'json'
+    });    
 
     // Load existing files:
     $('#fileupload').addClass('fileupload-processing');
-    $.ajax({
-        // Uncomment the following to send cross-domain cookies:
-        //xhrFields: {withCredentials: true},
+    
+    $.ajax({        
         url: $('#fileupload').fileupload('option', 'url'),
         dataType: 'json',
         context: $('#fileupload')[0]
@@ -46,6 +34,4 @@ $(function() {
         $(this).fileupload('option', 'done')
                 .call(this, $.Event('done'), {result: result});
     });
-
-
 });

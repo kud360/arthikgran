@@ -69,6 +69,22 @@ class OMRImage {
         Log::info('Grid Parsed', $this->grid);
         return $this;
     }
+    
+    public function getGrid()   {
+        return $this->grid;
+    }
+    
+    public function getGridString()   {
+        /*
+        $string = array();
+        foreach($this->grid as $row)    {
+            $string = implode('',$row);
+        }
+        return implode('',$string);
+         * 
+         */
+        return "Done :)";
+    }
 
     private function validateAspect() {
 
@@ -305,9 +321,9 @@ class OMRImage {
                 $draw->background('#0000ff');
                 $draw->border(1, '#f00');
             });
-            return TRUE;
+            return 1;
         } else {
-            return FALSE;
+            return 0;
         }
     }
 
