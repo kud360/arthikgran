@@ -7,7 +7,7 @@ and open the template in the editor.
 <html>
     <head>
         <meta charset="UTF-8">        
-        <title></title>       
+        <title>Bajaj Capital OASIS</title>       
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="<?= asset('css/bootstrap.min.css') ?>" rel="stylesheet">
         <link href="<?= asset('css/jquery.fileupload.css') ?>" rel="stylesheet">
@@ -16,7 +16,8 @@ and open the template in the editor.
         <noscript><link rel="stylesheet" href="<?= asset("css/jquery.fileupload-noscript.css") ?>"></noscript>
         <noscript><link rel="stylesheet" href="<?= asset("css/jquery.fileupload-ui-noscript.css") ?>"></noscript>
     </head>
-    <body><div class="navbar navbar-default navbar-fixed-top">
+    <body>
+        <div class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-fixed-top .navbar-collapse">
@@ -85,7 +86,7 @@ and open the template in the editor.
                         <h3>Correct Answers<small>The result table in this section will be filled up as and when the answer sheets are corrected.</small></h3>
                         <p class="lead">Result Table</p>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
+                            <table class="table table-bordered table-striped" id="resultTable">
                                 <tr>
                                     <th>
                                         Sr. No.
@@ -150,7 +151,6 @@ and open the template in the editor.
         <script src="js/jquery.fileupload.js"></script>        
         <script src="js/bootstrap.min.js"></script>
         <script>
-
             var defaultCorrect = [
                 'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D',
                 'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D',
@@ -169,10 +169,8 @@ and open the template in the editor.
                     sequentialUploads: true,
                     done: function(e, data) {
                         console.log(data);
-                        $("#statusText").text('File ' + data.files[0].name + " interpreted Successfully")
-                        alert(getName(data.result.grid));
-                        alert(getResult(data.result.grid));                        
-
+                        $("#statusText").text('File ' + data.files[0].name + " interpreted Successfully");
+                        publishResult(data.result.grid);
                     },
                     start: function(e, data) {
                         $('#answers label.active').addClass('btn-success')
@@ -183,7 +181,7 @@ and open the template in the editor.
                                 $(this).addClass('btn-success')
                                 correct.push($(this).text().trim());
                             }
-                        })
+                        });
                         if (data.loaded = data.total) {
                             $("#statusText").text("Uploading " + data.files[0].name);
                         }
@@ -218,7 +216,7 @@ and open the template in the editor.
 
                     }
                     $(this).removeClass('hidden');
-                })
+                });
             });
 
             function getName(grid) {
@@ -227,32 +225,65 @@ and open the template in the editor.
                 var EndRow = startRow + 26
                 var startColumn = 0;
                 var EndColumn = grid.length - 1;
-                var i,j
+                var i, j
 
                 for (j = startColumn; j < EndColumn; j++) {
                     for (i = startRow; i < EndRow; i++) {
-                        if(grid[j][i])  {
+                        if (grid[j][i]) {
                             name += String.fromCharCode(65 + i - startRow);
                             break;
                         }
                     }
-                    if(i===EndRow)   {
+                    if (i === EndRow) {
                         name += ' ';
-                    }                    
-                }                
-                
+                    }
+                }
+
                 return name.trim();
             }
-            
-            function getRollNo()    {
-                
-            }
-            
-            function getDiv()   {
-                
+
+            function getRollNo(grid) {
+                var startRow = 32;
+                var startColumn = 1;
+                var digits = 3;
+                var roll = 0;
+
+                for (var i = 0; i < digits; i++) {
+
+                    var faceValue = 0;
+
+                    for (var j = 0; j < 5; j++) {
+                        if (grid[ startColumn + i * 2 ][startRow + j]) {
+                            faceValue = j;
+                        } else if (grid[ startColumn + i * 2 + 1][startRow + j]) {
+                            faceValue = j + 5;
+                        }
+                        if (faceValue) {
+                            break;
+                        }
+                    }
+                    roll = roll * 10 + faceValue;
+                }
+                return roll;
             }
 
-            function getResult(grid) {
+            function getDiv(grid) {
+                var startRow = 32;
+                var startColumn = 10;
+                for (i = 0; i < 5; i++) {
+                    for (j = 0; j < 6; j++) {
+                        var alpha = i + (j * 5)
+                        if (j < 26) {
+                            if (grid[startColumn + j][startRow + i]) {
+                                return String.fromCharCode(65 + alpha)
+                            }
+                        }
+                    }
+                }
+                return ' ';
+            }
+
+            function getMarks(grid) {
 
                 var noOfAnswers = correct.length;
                 var answersInARow = 5;
@@ -261,11 +292,7 @@ and open the template in the editor.
                 var columnsPerAnswer = 6;
                 var startColumn = 1;
                 var startRow = 39;
-
                 var marks = 0;
-
-                console.log(correct);
-
                 for (var i = startRow; i < startRow + answersInAColumn * rowsPerAnswer; i += rowsPerAnswer) {
 
                     for (var j = startColumn; j < columnsPerAnswer * answersInARow; j += columnsPerAnswer) {
@@ -289,11 +316,31 @@ and open the template in the editor.
                         }
                     }
                 }
-
                 return marks;
             }
 
+            function publishResult(grid) {
+                var name = getName(grid);
+                var marks = getMarks(grid);
+                var roll = getRollNo(grid);
+                var div = getDiv(grid);
+                var srno = $("#resultTable tr").length;
+                var pass = (marks > 19) ? "Pass" : "Fail";
+                var $row = $('<tr></tr>');
+                $row.append($('<td></td>').append(srno));
+                $row.append($('<td></td>').append(name));
+                $row.append($('<td></td>').append(div));
+                $row.append($('<td></td>').append(roll));
+                $row.append($('<td></td>').append(marks));
+                $row.append($('<td></td>').append(pass));
+                if (pass == "Pass") {
+                    $row.addClass('success')
+                } else {
+                    $row.addClass('danger')
+                }
 
+                $("#resultTable").append($row);
+            }
         </script>
     </body>    
 </html>
