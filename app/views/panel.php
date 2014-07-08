@@ -83,7 +83,7 @@ and open the template in the editor.
                 </div>
                 <div class="tab-pane" id="result">
                     <blockquote>
-                        <h3>Correct Answers<small>The result table in this section will be filled up as and when the answer sheets are corrected.</small></h3>
+                        <h3>Results<small>The result table in this section will be filled up as and when the answer sheets are corrected.</small></h3>
                         <p class="lead">Result Table</p>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped" id="resultTable">
@@ -188,7 +188,7 @@ and open the template in the editor.
                     },
                     progress: function(e, data) {
                         if (data.loaded == data.total) {
-                            $("#statusText").text("Interpreting " + data.files[0].name);
+                            $("#statusText").text("Interpreting " + data.files[0].name". This can take upto a minute ...");
                         }   else    {
                             $("#statusText").text("Uploading " + data.files[0].name);                            
                         }
