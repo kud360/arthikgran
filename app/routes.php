@@ -25,7 +25,7 @@ Route::get('/test', function() {
 });
 
 
-Route::post('/testparse', function() {
+Route::post('/test', function() {
     $validator = Validator::make(Input::file(), array(
                 "image" => 'required|image|max:2048'
     ));

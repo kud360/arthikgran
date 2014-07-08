@@ -19,7 +19,7 @@ class OMRImage {
     private $tolerance;
     private $xMargin;
     private $yMargin;
-    private $marginSafety = 0.5;
+    private $marginSafety = 0.6;
     private $torelanceConstant = 0.2;
     private $yCoord;
     private $xCoord;
@@ -41,10 +41,12 @@ class OMRImage {
     }
 
     public function prepare() {
-        $this->greyscale();
-        $this->blur(20);
-        $this->contrast(40);
-        $this->validateAspect();
+        $this->trim('top-left', null, 60);
+        $this->greyscale();                
+        $this->blur(10);        
+        $this->maxX = $this->image->width();
+        $this->maxY = $this->image->height();
+        $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);                
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
@@ -169,7 +171,7 @@ class OMRImage {
         //Flattens out white points beyond a threshold
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
-            if ($cellAverageGrid[$i] < round($this->cellSize / 2)) {
+            if ($cellAverageGrid[$i] < round($this->cellSize / 2.5)) {
                 $cellAverageGrid[$i] = 0;
             }
         }
