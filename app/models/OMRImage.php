@@ -24,8 +24,9 @@ class OMRImage {
     private $yCoord;
     private $xCoord;
     private $grid;
-    private $Imagick;
+    private $imageCore;
     private $maxX, $maxY;
+    private $health;
 
     public function __call($method_name, $args) {
         if (method_exists($this->image, $method_name)) {
@@ -41,16 +42,17 @@ class OMRImage {
     }
 
     public function prepare() {
+        $this->health = array();
         Log::info("prepare called");
-        $this->trim('top-left', null, 60);
-        Log::info("Image trimmed");
+        $this->greyscale();
+        Log::info("Image Greyscaled");
         $this->blur(10);
-        Log::info("Blur Applied");        
-        $this->getCore()->blackThresholdImage('#CCCCCC');
-        Log::info("Image Blackened");
+        Log::info("Image blurred");
+        $this->trim('top-left', array('top','left'), 50);
+        Log::info("Image trimmed");
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
-        $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);                
+        $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
@@ -60,13 +62,13 @@ class OMRImage {
         );
         $this->xMargin = round($this->marginSafety * $this->dpi);
         $this->yMargin = round($this->marginSafety * $this->dpi);
-        $this->Imagick = $this->image->getCore();
+        $this->imageCore = $this->image->getCore();
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
         Log::info(count($this->xCoord) . 'XCoords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
         Log::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
         $this->correctRotation();
-        $this->Imagick = $this->image->getCore();
+        $this->imageCore = $this->image->getCore();
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
         Log::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
@@ -75,35 +77,21 @@ class OMRImage {
         Log::info('Grid Parsed', $this->grid);
         return $this;
     }
-    
-    public function getGrid()   {
+
+    public function getGrid() {
         return $this->grid;
     }
-    
-    public function getGridString()   {
+
+    public function getGridString() {
         /*
-        $string = array();
-        foreach($this->grid as $row)    {
-            $string = implode('',$row);
-        }
-        return implode('',$string);
+          $string = array();
+          foreach($this->grid as $row)    {
+          $string = implode('',$row);
+          }
+          return implode('',$string);
          * 
          */
         return "Done :)";
-    }
-
-    private function validateAspect() {
-
-        $aspectRatio = $this->image->width() / $this->image->height();
-        if ($aspectRatio > 0.704 && $aspectRatio < 0.732) {
-            Log::info('Aspect ratio validates A4 compliance.');
-            Log::info('Image DPI detected: ' .
-                    ($this->width() / 8.27) .
-                    'X' .
-                    ($this->height() / 11.7));
-        } else {
-            Log::error('Aspect ratio out of bounds for A4 limits');
-        }
     }
 
     private function stripBlackAverage($coord, $margin, $direction, $stripLength = 5) {
@@ -126,8 +114,7 @@ class OMRImage {
         if ($x < 0 || $y < 0 || $x >= $this->maxX || $y >= $this->maxY) {
             return 0;
         } else {
-            $color = $this->Imagick->getImagePixelColor((int) $x, (int) $y)->getColor();
-            if ($color['r'] < 150) {
+            if ((imagecolorat($this->imageCore, (int) $x, (int) $y) & 0xFF) < 0x99) {
                 return 1;
             } else {
                 return 0;
@@ -218,9 +205,13 @@ class OMRImage {
         return $stripCoords;
     }
 
-    public function correctRotation() {
-        
+    public function correctRotation($debug = FALSE) {
+
         Log::debug("Rotation Started");
+
+        if (count($this->yCoord) == 0 || count($this->xCoord) == 0) {
+            return $this;
+        }
 
         $top_y = $this->yCoord[0];
         $bottom_y = $this->yCoord[count($this->yCoord) - 1];
@@ -230,7 +221,7 @@ class OMRImage {
         for ($i = $this->xMargin; $i < $this->maxX; $i++) {
             if ($this->stripBlackAverage($i, $top_y - 2, 'y', 5) > 3) {
                 $white_count = 0;
-                if ($this->stripBlackAverage($i+20, $top_y - 2, 'y', 5) > 3) {
+                if ($this->stripBlackAverage($i + 20, $top_y - 2, 'y', 5) > 3) {
                     $i+=20;
                 }
             } else {
@@ -249,14 +240,14 @@ class OMRImage {
             }
         }
         $top_margin = $i - 5;
-        
+
         Log::debug("Top Trace Completed");
 
         $white_count = 0;
         for ($i = $this->xMargin; $i < $this->maxX; $i++) {
             if ($this->stripBlackAverage($i, $bottom_y - 2, 'y', 5) > 3) {
                 $white_count = 0;
-                if ($this->stripBlackAverage($i+20, $bottom_y - 2, 'y', 5) > 3) {
+                if ($this->stripBlackAverage($i + 20, $bottom_y - 2, 'y', 5) > 3) {
                     $i+=20;
                 }
             } else {
@@ -275,7 +266,7 @@ class OMRImage {
             }
         }
         $bottom_margin = $i - 5;
-        
+
         Log::debug("Bottom Trace Completed");
 
         $hyp = sqrt(
@@ -291,23 +282,21 @@ class OMRImage {
             "top_y" => $top_y
         ));
 
-        $this->image->circle(20, $bottom_margin, $bottom_y, function ($draw) {
-            $draw->background('#0000ff');
-            $draw->border(1, '#f00');
-        });
+        if ($debug) {
+            $this->image->circle(20, $bottom_margin, $bottom_y, function ($draw) {
+                $draw->background('#00f');
+                $draw->border(1, '#f00');
+            });
 
-        $this->image->circle(20, $top_margin, $top_y, function ($draw) {
-            $draw->background('#0000ff');
-            $draw->border(1, '#f00');
-        });
+            $this->image->circle(20, $top_margin, $top_y, function ($draw) {
+                $draw->background('#00f');
+                $draw->border(1, '#f00');
+            });
+        }
 
-        $height = $this->height();
-        $width = $this->width();
-
-        $this->image->rotate($rotation, 0xFFFFFF)
-                ->resizeCanvas(
-                        $this->maxX, $this->maxY, 'center', false, 'ffffff');
-
+        $this->image->rotate($rotation, 0xFFFFFF);
+        $this->maxY = $this->height();
+        $this->maxX = $this->width();
         return $this;
     }
 
@@ -372,6 +361,10 @@ class OMRImage {
         $this->image->line(0, $this->yMargin, $this->image->width(), $this->yMargin, function ($draw) {
             $draw->color('#eee');
         });
+    }
+
+    private function health() {
+        //To output the quality of detection.
     }
 
 }
