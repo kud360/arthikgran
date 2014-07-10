@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -26,6 +26,7 @@ class OMRImage {
     private $imageCore;
     private $maxX, $maxY;
     private $health;
+    private $blackMark = 0xAA;
 
     public function __call($method_name, $args) {
         if (method_exists($this->image, $method_name)) {
@@ -42,16 +43,13 @@ class OMRImage {
 
     public function prepare() {
         $this->health = array();
-        Debugbar::startMeasure('greyscale', 'Greyscale');        
+        Debugbar::startMeasure('greyscale', 'Greyscale');
         $this->greyscale();
-        Debugbar::stopMeasure('greyscale');
-        Debugbar::startMeasure('blur', 'Blur');                
-        $this->blur(10);
-        Debugbar::stopMeasure('blur');
-        Debugbar::startMeasure('trim', 'Trim');                
-        $this->trim('top-left', array('top', 'left'), 50);
+        Debugbar::stopMeasure('greyscale');        
+        Debugbar::startMeasure('trim', 'Trim');
+        $this->trimBlack();
         Debugbar::stopMeasure('trim');
-        Debugbar::startMeasure('calculate', 'Calculate');                
+        Debugbar::startMeasure('calculate', 'Calculate');
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
@@ -65,17 +63,17 @@ class OMRImage {
         $this->xMargin = round($this->marginSafety * $this->dpi);
         $this->yMargin = round($this->marginSafety * $this->dpi);
         $this->imageCore = $this->image->getCore();
-        Debugbar::stopMeasure('calculate');                
-        Debugbar::startMeasure('preRotationStripDetect', 'Detecting Strips Before Rotation');                
+        Debugbar::stopMeasure('calculate');
+        Debugbar::startMeasure('preRotationStripDetect', 'Detecting Strips Before Rotation');
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
         Debugbar::info(count($this->xCoord) . 'XCoords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
         Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
         Debugbar::stopMeasure('preRotationStripDetect');
-        Debugbar::startMeasure('rotation','Calling Rotation');
+        Debugbar::startMeasure('rotation', 'Calling Rotation');
         $this->correctRotation();
         Debugbar::stopMeasure('rotation');
-        Debugbar::startMeasure('postRotationStripDetect', 'Detecting Strips After Rotation');                
+        Debugbar::startMeasure('postRotationStripDetect', 'Detecting Strips After Rotation');
         $this->imageCore = $this->image->getCore();
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
         Debugbar::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
@@ -123,7 +121,7 @@ class OMRImage {
         if ($x < 0 || $y < 0 || $x >= $this->maxX || $y >= $this->maxY) {
             return 0;
         } else {
-            if ((imagecolorat($this->imageCore, (int) $x, (int) $y) & 0xFF) < 0xBB) {
+            if ((imagecolorat($this->imageCore, (int) $x, (int) $y) & 0xFF) < $this->blackMark) {
                 return 1;
             } else {
                 return 0;
@@ -374,6 +372,28 @@ class OMRImage {
 
     private function health() {
         //To output the quality of detection.
+    }
+
+    private function trimBlack() {
+        $realX = 0;
+        $lastX = (int) ($this->image->width());
+        $lastY = (int) $this->image->height();
+        $black =  $this->blackMark * 3;
+        $im = $this->image->getCore();
+
+        //Trimming the left edge
+        for ($i = 0; $i < $lastX / 4; $i++) {
+            for ($j = 1; $j < $lastY-1; $j++) {
+                if ((imagecolorat($im, $i, $j-1) & 0xFF) + (imagecolorat($im, $i, $j) & 0xFF) + (imagecolorat($im, $i, $j+1) & 0xFF) < $black)
+                    break 2;
+            }
+        }
+
+        $realX = $i;
+        
+        $newImg = imagecreatetruecolor ( $lastX - $realX , $lastY );
+        imagecopy ( $newImg , $im , 0 , 0 , $realX , 0 , $lastX - $realX , $lastY );
+        $this->setCore($newImg);
     }
 
 }

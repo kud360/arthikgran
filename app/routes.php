@@ -26,6 +26,7 @@ Route::get('/test', function() {
 
 
 Route::post('/test', function() {
+    Debugbar::disable();
     $validator = Validator::make(Input::file(), array(
                 "image" => 'required|image|max:2048'
     ));
