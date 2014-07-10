@@ -1,5 +1,4 @@
 ﻿<?php
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -43,13 +42,16 @@ class OMRImage {
 
     public function prepare() {
         $this->health = array();
-        Log::info("prepare called");
+        Debugbar::startMeasure('greyscale', 'Greyscale');        
         $this->greyscale();
-        Log::info("Image Greyscaled");
+        Debugbar::stopMeasure('greyscale');
+        Debugbar::startMeasure('blur', 'Blur');                
         $this->blur(10);
-        Log::info("Image blurred");
-        $this->trim('top-left', array('top','left'), 50);
-        Log::info("Image trimmed");
+        Debugbar::stopMeasure('blur');
+        Debugbar::startMeasure('trim', 'Trim');                
+        $this->trim('top-left', array('top', 'left'), 50);
+        Debugbar::stopMeasure('trim');
+        Debugbar::startMeasure('calculate', 'Calculate');                
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
@@ -63,18 +65,25 @@ class OMRImage {
         $this->xMargin = round($this->marginSafety * $this->dpi);
         $this->yMargin = round($this->marginSafety * $this->dpi);
         $this->imageCore = $this->image->getCore();
+        Debugbar::stopMeasure('calculate');                
+        Debugbar::startMeasure('preRotationStripDetect', 'Detecting Strips Before Rotation');                
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
-        Log::info(count($this->xCoord) . 'XCoords detected', $this->xCoord);
+        Debugbar::info(count($this->xCoord) . 'XCoords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
-        Log::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
+        Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
+        Debugbar::stopMeasure('preRotationStripDetect');
+        Debugbar::startMeasure('rotation','Calling Rotation');
         $this->correctRotation();
+        Debugbar::stopMeasure('rotation');
+        Debugbar::startMeasure('postRotationStripDetect', 'Detecting Strips After Rotation');                
         $this->imageCore = $this->image->getCore();
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
-        Log::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
+        Debugbar::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
-        Log::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
+        Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
+        Debugbar::stopMeasure('postRotationStripDetect');
         $this->parseGrid();
-        Log::info('Grid Parsed', $this->grid);
+        Debugbar::info('Grid Parsed', $this->grid);
         return $this;
     }
 
@@ -131,7 +140,7 @@ class OMRImage {
 
         $sliderDir = (round($this->image->height()) == round($axisMaxValue)) ? 'x' : 'y';
 
-        Log::debug("slideDir : " . $sliderDir . " Margin : " . $margin . " Axis: " . $axisMaxValue);
+        Debugbar::debug("slideDir : " . $sliderDir . " Margin : " . $margin . " Axis: " . $axisMaxValue);
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
             if ($this->stripBlackAverage($i, $margin, $sliderDir) > 3) {
@@ -141,7 +150,7 @@ class OMRImage {
             }
         }
 
-        Log::debug("blackBooleanAxis : ", $blackBooleanAxis);
+        Debugbar::debug("blackBooleanAxis : ", $blackBooleanAxis);
 
         //It uses a slider along Y-axis and calculate's the average blackness
         //e.g. a point in vertical middle of the strip would score the highest
@@ -159,7 +168,7 @@ class OMRImage {
             ));
         }
 
-        //Log::debug("cellAverageGrid : ",$cellAverageGrid);
+        //Debugbar::debug("cellAverageGrid : ",$cellAverageGrid);
         //Flattens out white points beyond a threshold
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
@@ -168,7 +177,7 @@ class OMRImage {
             }
         }
 
-        Log::debug("cellAverageGrid : ", $cellAverageGrid);
+        Debugbar::debug("cellAverageGrid : ", $cellAverageGrid);
 
         // Finding the co-rodinate of strips
         // the centre would have highest surrounding blackness
@@ -182,32 +191,32 @@ class OMRImage {
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
             if ($cellAverageGrid[$i] > 0 && $stripStartfound == 'no' && $stripEndFound == 'no') {
-                //Log::debug("Starting peak at :".$i);
+                //Debugbar::debug("Starting peak at :".$i);
                 $stripStart = $i;
                 $stripStartfound = 'yes';
             }
             if ($cellAverageGrid[$i] == 0 && $stripStartfound == 'yes' && $stripEndFound == 'no') {
-                //Log::debug("Ending peak at :".$i);
+                //Debugbar::debug("Ending peak at :".$i);
                 $stripEnd = $i;
                 $stripEndFound = 'yes';
             }
 
             if ($stripStartfound == 'yes' && $stripEndFound == 'yes') {
-                //Log::debug("Peak at : ".round(($stripStart + $stripEnd)/2.0));
+                //Debugbar::debug("Peak at : ".round(($stripStart + $stripEnd)/2.0));
                 $stripCoords[] = round(($stripStart + $stripEnd) / 2.0);
                 $stripStartfound = 'no';
                 $stripEndFound = 'no';
             }
         }
 
-        Log::debug("stripCoords : ", $stripCoords);
+        Debugbar::debug("stripCoords : ", $stripCoords);
 
         return $stripCoords;
     }
 
     public function correctRotation($debug = FALSE) {
 
-        Log::debug("Rotation Started");
+        Debugbar::debug("Rotation Started");
 
         if (count($this->yCoord) == 0 || count($this->xCoord) == 0) {
             return $this;
@@ -241,7 +250,7 @@ class OMRImage {
         }
         $top_margin = $i - 5;
 
-        Log::debug("Top Trace Completed");
+        Debugbar::debug("Top Trace Completed");
 
         $white_count = 0;
         for ($i = $this->xMargin; $i < $this->maxX; $i++) {
@@ -267,7 +276,7 @@ class OMRImage {
         }
         $bottom_margin = $i - 5;
 
-        Log::debug("Bottom Trace Completed");
+        Debugbar::debug("Bottom Trace Completed");
 
         $hyp = sqrt(
                 ($bottom_margin - $top_margin) * ($bottom_margin - $top_margin) + ($bottom_y - $top_y) * ($bottom_y - $top_y)
@@ -275,7 +284,7 @@ class OMRImage {
         $angle_radian = asin(($bottom_y - $top_y) / $hyp);
         $angle_degree = ($angle_radian / (2 * pi())) * 360;
         $rotation = 90 - $angle_degree;
-        Log::info("Rotation : " . $rotation, array(
+        Debugbar::info("Rotation : " . $rotation, array(
             "bottom_x" => $bottom_margin,
             "bottom_y" => $bottom_y,
             "top_x" => $top_margin,
