@@ -6,7 +6,8 @@
 	"require": {
 		"laravel/framework": "4.1.*",
                 "intervention/image": "2.*",
-                "kmd/logviewer": "1.1.*"                
+                "kmd/logviewer": "1.1.*",
+		"barryvdh/laravel-debugbar": "1.x"                
 	},
 	"autoload": {
 		"classmap": [

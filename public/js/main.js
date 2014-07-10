@@ -171,26 +171,25 @@ function getMarks(grid) {
     var set = getSet(grid)
     var noOfAnswers = correct[set].length;
     var answersInARow = 5;
-    var answersInAColumn = Math.ceil(noOfAnswers / answersInARow);
+    var answersInAColumn = 5;
     var rowsPerAnswer = 1;
     var columnsPerAnswer = 6;
     var startColumn = 1;
     var startRow = 39;
     var marks = 0;
+    
+    console.log(set);
 
-    for (var i = startRow; i < startRow + answersInAColumn * rowsPerAnswer; i += rowsPerAnswer) {
-
-        for (var j = startColumn; j < columnsPerAnswer * answersInARow; j += columnsPerAnswer) {
-
-            var questionNo = ((j - startColumn) / columnsPerAnswer) * answersInAColumn + ((i - startRow) / rowsPerAnswer);
-
+    for (var i = 0; i < 5; i++) {
+        for (var j = 0;j < 5; j++) {
+            var questionNo = j*5 + i;            
             if (questionNo <= noOfAnswers) {
                 var option = '';
 
-                option += (grid[j][i]) ? 'A' : '';
-                option += (grid[j + 1][i]) ? 'B' : '';
-                option += grid[j + 2][i] ? 'C' : '';
-                option += grid[j + 3][i] ? 'D' : '';
+                option += grid[startColumn + j*6 + 0][startRow + i] ? 'A' : '';
+                option += grid[startColumn + j*6 + 1][startRow + i] ? 'B' : '';
+                option += grid[startColumn + j*6 + 2][startRow + i] ? 'C' : '';
+                option += grid[startColumn + j*6 + 3][startRow + i] ? 'D' : '';
 
                 console.log(questionNo + ' ( ' + i + ',' + j + ' ) : ' + option);
 

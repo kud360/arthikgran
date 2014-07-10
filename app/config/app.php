@@ -95,7 +95,8 @@ return array(
         'Illuminate\View\ViewServiceProvider',
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Kmd\Logviewer\LogviewerServiceProvider',
-        'Intervention\Image\ImageServiceProvider',        
+        'Intervention\Image\ImageServiceProvider',
+        'Barryvdh\Debugbar\ServiceProvider'
     ),
     /*
       |--------------------------------------------------------------------------
