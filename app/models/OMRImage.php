@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -114,7 +114,7 @@ class OMRImage {
         if ($x < 0 || $y < 0 || $x >= $this->maxX || $y >= $this->maxY) {
             return 0;
         } else {
-            if ((imagecolorat($this->imageCore, (int) $x, (int) $y) & 0xFF) < 0x99) {
+            if ((imagecolorat($this->imageCore, (int) $x, (int) $y) & 0xFF) < 0xBB) {
                 return 1;
             } else {
                 return 0;
