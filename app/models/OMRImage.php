@@ -1,4 +1,5 @@
 <?php
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -45,7 +46,7 @@ class OMRImage {
         $this->health = array();
         Debugbar::startMeasure('greyscale', 'Greyscale');
         $this->greyscale();
-        Debugbar::stopMeasure('greyscale');        
+        Debugbar::stopMeasure('greyscale');
         Debugbar::startMeasure('trim', 'Trim');
         $this->trimBlack();
         Debugbar::stopMeasure('trim');
@@ -58,7 +59,7 @@ class OMRImage {
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
         $this->cellSize = ($this->dpi) / 10;
         $this->tolerance = round(
-                pow($this->cellSize, 2) * $this->torelanceConstant / 4
+                pow($this->cellSize, 2) * $this->torelanceConstant
         );
         $this->xMargin = round($this->marginSafety * $this->dpi);
         $this->yMargin = round($this->marginSafety * $this->dpi);
@@ -141,7 +142,7 @@ class OMRImage {
         Debugbar::debug("slideDir : " . $sliderDir . " Margin : " . $margin . " Axis: " . $axisMaxValue);
 
         for ($i = 0; $i < $axisMaxValue; $i++) {
-            if ($this->stripBlackAverage($i, $margin, $sliderDir) > 3) {
+            if ($i > $margin && $this->stripBlackAverage($i, $margin, $sliderDir) > 3) {
                 $blackBooleanAxis[$i] = 1;
             } else {
                 $blackBooleanAxis[$i] = 0;
@@ -155,26 +156,21 @@ class OMRImage {
 
         $cellAverageGrid = array();
         for ($i = 0; $i < $axisMaxValue; $i++) {
-            $offset = max($i - round($this->cellSize / 2), 0);
-            if ($i < round($this->cellSize / 2)) {
-                $length = round($this->cellSize / 2 + $i);
-            } else {
-                $length = $this->cellSize;
-            }
-            $cellAverageGrid[$i] = array_sum(array_slice(
-                            $blackBooleanAxis, $offset, $length
-            ));
-        }
-
-        //Debugbar::debug("cellAverageGrid : ",$cellAverageGrid);
-        //Flattens out white points beyond a threshold
-
-        for ($i = 0; $i < $axisMaxValue; $i++) {
-            if ($cellAverageGrid[$i] < round($this->cellSize / 2.5)) {
+            if ($i < $margin) {
                 $cellAverageGrid[$i] = 0;
+            } else {
+                $offset = $i - round($this->cellSize / 2);
+                $length = $this->cellSize;
+                $sum = array_sum(array_slice(
+                                $blackBooleanAxis, $offset, $length
+                ));
+                if ($sum < round($this->cellSize / 2.5)) {
+                    $sum = 0;
+                }
+                $cellAverageGrid[$i] = $sum;
             }
         }
-
+        
         Debugbar::debug("cellAverageGrid : ", $cellAverageGrid);
 
         // Finding the co-rodinate of strips
@@ -319,10 +315,10 @@ class OMRImage {
 
     private function isBlackDot($x, $y) {
         $counter = 0;
-        $minX = round($x - $this->cellSize / 4);
-        $maxX = round($x + $this->cellSize / 4);
-        $minY = round($y - $this->cellSize / 4);
-        $maxY = round($y + $this->cellSize / 4);
+        $minX = round($x - $this->cellSize / 3);
+        $maxX = round($x + $this->cellSize / 3);
+        $minY = round($y - $this->cellSize / 3);
+        $maxY = round($y + $this->cellSize / 3);
         for ($i = $minX; $i < $maxX; $i++) {
             for ($j = $minY; $j < $maxY; $j++) {
                 if ($this->isBlack($i, $j)) {
@@ -378,21 +374,21 @@ class OMRImage {
         $realX = 0;
         $lastX = (int) ($this->image->width());
         $lastY = (int) $this->image->height();
-        $black =  $this->blackMark * 3;
+        $black = $this->blackMark * 3;
         $im = $this->image->getCore();
 
         //Trimming the left edge
         for ($i = 0; $i < $lastX / 4; $i++) {
-            for ($j = 1; $j < $lastY-1; $j++) {
-                if ((imagecolorat($im, $i, $j-1) & 0xFF) + (imagecolorat($im, $i, $j) & 0xFF) + (imagecolorat($im, $i, $j+1) & 0xFF) < $black)
+            for ($j = 1; $j < $lastY - 1; $j++) {
+                if ((imagecolorat($im, $i, $j - 1) & 0xFF) + (imagecolorat($im, $i, $j) & 0xFF) + (imagecolorat($im, $i, $j + 1) & 0xFF) < $black)
                     break 2;
             }
         }
 
         $realX = $i;
-        
-        $newImg = imagecreatetruecolor ( $lastX - $realX , $lastY );
-        imagecopy ( $newImg , $im , 0 , 0 , $realX , 0 , $lastX - $realX , $lastY );
+
+        $newImg = imagecreatetruecolor($lastX - $realX, $lastY);
+        imagecopy($newImg, $im, 0, 0, $realX, 0, $lastX - $realX, $lastY);
         $this->setCore($newImg);
     }
 
