@@ -27,7 +27,7 @@ class OMRImage {
     private $imageCore;
     private $maxX, $maxY;
     private $health;
-    private $blackMark = 0xAA;
+    private $blackMark = 0xCC;
 
     public function __call($method_name, $args) {
         if (method_exists($this->image, $method_name)) {
