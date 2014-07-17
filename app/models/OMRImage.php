@@ -19,7 +19,7 @@ class OMRImage {
     private $tolerance;
     private $xMargin;
     private $yMargin;
-    private $marginSafety = 0.6;
+    private $marginSafety = 0.7;
     private $torelanceConstant = 0.2;
     private $yCoord;
     private $xCoord;
@@ -27,7 +27,7 @@ class OMRImage {
     private $imageCore;
     private $maxX, $maxY;
     private $health;
-    private $blackMark = 0xCC;
+    private $blackMark = 0xAA;    
 
     public function __call($method_name, $args) {
         if (method_exists($this->image, $method_name)) {
@@ -271,13 +271,8 @@ class OMRImage {
         $bottom_margin = $i - 5;
 
         Debugbar::debug("Bottom Trace Completed");
-
-        $hyp = sqrt(
-                ($bottom_margin - $top_margin) * ($bottom_margin - $top_margin) + ($bottom_y - $top_y) * ($bottom_y - $top_y)
-        );
-        $angle_radian = asin(($bottom_y - $top_y) / $hyp);
-        $angle_degree = ($angle_radian / (2 * pi())) * 360;
-        $rotation = 90 - $angle_degree;
+        $angle_radian = atan(($bottom_margin - $top_margin) / ($bottom_y - $top_y));
+        $rotation = ($angle_radian / (2 * pi())) * 360;        
         Debugbar::info("Rotation : " . $rotation, array(
             "bottom_x" => $bottom_margin,
             "bottom_y" => $bottom_y,
@@ -297,7 +292,7 @@ class OMRImage {
             });
         }
 
-        $this->image->rotate($rotation, 0xFFFFFF);
+        $this->image->rotate(360 - $rotation, 0xFFFFFF);
         $this->maxY = $this->height();
         $this->maxX = $this->width();
         return $this;
@@ -315,13 +310,13 @@ class OMRImage {
 
     private function isBlackDot($x, $y) {
         $counter = 0;
-        $minX = round($x - $this->cellSize / 3);
-        $maxX = round($x + $this->cellSize / 3);
-        $minY = round($y - $this->cellSize / 3);
-        $maxY = round($y + $this->cellSize / 3);
+        $minX = round($x - $this->cellSize / 2.5);
+        $maxX = round($x + $this->cellSize / 2.5);
+        $minY = round($y - $this->cellSize / 2.5);
+        $maxY = round($y + $this->cellSize / 2.5);
         for ($i = $minX; $i < $maxX; $i++) {
             for ($j = $minY; $j < $maxY; $j++) {
-                if ($this->isBlack($i, $j)) {
+                if ( (imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0xDD ) {
                     $counter++;
                 }
             }
