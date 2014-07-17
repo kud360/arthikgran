@@ -208,7 +208,7 @@ class OMRImage {
         return $stripCoords;
     }
 
-    public function correctRotation($debug = FALSE) {
+    public function correctRotation($debug = TRUE) {
 
         Debugbar::debug("Rotation Started");
 
