@@ -89,12 +89,15 @@ and open the template in the editor.
                                     </th>
                                     <th>
                                         Name
-                                    </th>
+                                    </th>                                    
                                     <th>
                                         Division
                                     </th>
                                     <th>
                                         Roll Number
+                                    </th>
+                                    <th>
+                                        Set
                                     </th>
                                     <th>
                                         Marks
@@ -125,7 +128,7 @@ and open the template in the editor.
                                 <div id="collapseOne" class="panel-collapse collapse">
                                     <div class="panel-body">                                        
                                         <div class="hidden well-lg row" id='set1'>
-                                            <div class="well well-sm col-lg-2">
+                                            <div class="well well-sm col-sm-2">
                                                 <span class="badge">1</span>&nbsp;
                                                 <div class="btn-group" data-toggle="buttons">                            
                                                     <label class="btn btn-default btn-sm">
@@ -157,7 +160,7 @@ and open the template in the editor.
                                 <div id="collapseTwo" class="panel-collapse collapse">
                                     <div class="panel-body">
                                         <div class="hidden well-lg row" id='set2'>
-                                            <div class="well well-sm col-lg-2">
+                                            <div class="well well-sm col-sm-2">
                                                 <span class="badge">1</span>&nbsp;
                                                 <div class="btn-group" data-toggle="buttons">                            
                                                     <label class="btn btn-default btn-sm">
@@ -189,7 +192,7 @@ and open the template in the editor.
                                 <div id="collapseThree" class="panel-collapse collapse">
                                     <div class="panel-body">
                                         <div class="hidden well-lg row" id='set3'>
-                                            <div class="well well-sm col-lg-2">
+                                            <div class="well well-sm col-sm-2">
                                                 <span class="badge">1</span>&nbsp;
                                                 <div class="btn-group" data-toggle="buttons">                            
                                                     <label class="btn btn-default btn-sm">
@@ -221,7 +224,7 @@ and open the template in the editor.
                                 <div id="collapseFour" class="panel-collapse collapse">
                                     <div class="panel-body">
                                         <div class="hidden well-lg row" id='set4'>
-                                            <div class="well well-sm col-lg-2">
+                                            <div class="well well-sm col-sm-2">
                                                 <span class="badge">1</span>&nbsp;
                                                 <div class="btn-group" data-toggle="buttons">                            
                                                     <label class="btn btn-default btn-sm">
@@ -253,7 +256,7 @@ and open the template in the editor.
                                 <div id="collapseFive" class="panel-collapse collapse">
                                     <div class="panel-body">
                                         <div class="hidden well-lg row" id='set5'>
-                                            <div class="well well-sm col-lg-2">
+                                            <div class="well well-sm col-sm-2">
                                                 <span class="badge">1</span>&nbsp;
                                                 <div class="btn-group" data-toggle="buttons">                            
                                                     <label class="btn btn-default btn-sm">

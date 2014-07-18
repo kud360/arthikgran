@@ -169,11 +169,7 @@ function getDiv(grid) {
 function getMarks(grid) {
 
     var set = getSet(grid)
-    var noOfAnswers = correct[set].length;
-    var answersInARow = 5;
-    var answersInAColumn = 5;
-    var rowsPerAnswer = 1;
-    var columnsPerAnswer = 6;
+    var noOfAnswers = correct[set].length;    
     var startColumn = 1;
     var startRow = 39;
     var marks = 0;
@@ -208,6 +204,7 @@ function publishResult(grid) {
     var marks = getMarks(grid);
     var roll = getRollNo(grid);
     var div = getDiv(grid);
+    var set = getSet(grid)+1;
     var srno = $("#resultTable tr").length;
     var pass = (marks > 19) ? 1 : 0;
     var $row = $('<tr></tr>');
@@ -215,6 +212,7 @@ function publishResult(grid) {
     $row.append($('<td></td>').append('<b>' + name + '</b>'));
     $row.append($('<td></td>').append(div));
     $row.append($('<td></td>').append(roll));
+    $row.append($('<td></td>').append(set));
     $row.append($('<td></td>').append(marks));
     if (pass) {
         $row.addClass('success');
