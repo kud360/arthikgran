@@ -335,25 +335,32 @@ class OMRImage {
             });
             return 1;
         } else {
+            /*
+            $this->image->circle($this->radius,$x,$y, function ($draw) {                
+                $draw->border(1,'#f00');
+            });
+             * 
+             */
             return 0;
         }
     }
 
     private function isGridMarked($midX, $midY) {
-        if ($midX > $this->maxX / 2 && $midY > 2 * $this->maxY / 3) {
-            $X = round($this->radius * 2);
-            $Y = round($this->radius * 2);            
+        if ($midY > $this->yCoord[38] && $midY < $this->yCoord[48]) {            
+            $X = round($this->radius * 0.5);            
+            $Y = round($this->radius * 0.5);
+            $midX += round($this->radius * 0.25);            
             $x = $y = $dx = 0;
             $dy = -1;
             $t = max($X, $Y);
             $maxI = $t * $t;
             for ($i = 0; $i < $maxI; $i++) {
                 if ((-$X / 2 <= $x) && ($x <= $X / 2) && (-$Y / 2 <= $y) && ($y <= $Y / 2)) {
-                    if ($this->detectCircleAround($midX + $x, $midY + $y)) {                        
+                    //if ($this->detectCircleAround($midX + $x, $midY + $y)) {                        
                         if($this->isBlackDot($midX + $x, $midY + $y))    {
                             return 1;
                         }
-                    }
+                    //}
                 }
                 if (($x == $y) || (($x < 0) && ($x == -$y)) || (($x > 0) && ($x == 1 - $y))) {
                     $t = $dx;
