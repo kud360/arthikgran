@@ -44,8 +44,8 @@ class OMRImage {
         return $this;
     }
 
-    public function prepare() {        
-        $this->health = array();        
+    public function prepare() {
+        $this->health = array();
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $tempImg = imagecreatetruecolor(1653, 2338);
@@ -336,9 +336,9 @@ class OMRImage {
             return 1;
         } else {
             /*
-            $this->image->circle($this->radius,$x,$y, function ($draw) {                
-                $draw->border(1,'#f00');
-            });
+              $this->image->circle($this->radius,$x,$y, function ($draw) {
+              $draw->border(1,'#f00');
+              });
              * 
              */
             return 0;
@@ -346,10 +346,12 @@ class OMRImage {
     }
 
     private function isGridMarked($midX, $midY) {
-        if ($midX > $this->xCoord[12] && $midY > $this->yCoord[38] && $midY < $this->yCoord[48]) {            
-            $X = round($this->radius * 0.5);            
+        if ($midY > $this->yCoord[38] && $midY < $this->yCoord[44]) {
+            $X = round($this->radius * 0.5);
             $Y = round($this->radius * 0.5);
-            $midX += round($this->radius * 0.25);            
+            if ($midX > $this->xCoord[12]) {
+                $midX += round($this->radius * 0.3);
+            }
             $x = $y = $dx = 0;
             $dy = -1;
             $t = max($X, $Y);
@@ -357,9 +359,9 @@ class OMRImage {
             for ($i = 0; $i < $maxI; $i++) {
                 if ((-$X / 2 <= $x) && ($x <= $X / 2) && (-$Y / 2 <= $y) && ($y <= $Y / 2)) {
                     //if ($this->detectCircleAround($midX + $x, $midY + $y)) {                        
-                        if($this->isBlackDot($midX + $x, $midY + $y))    {
-                            return 1;
-                        }
+                    if ($this->isBlackDot($midX + $x, $midY + $y)) {
+                        return 1;
+                    }
                     //}
                 }
                 if (($x == $y) || (($x < 0) && ($x == -$y)) || (($x > 0) && ($x == 1 - $y))) {
@@ -371,9 +373,11 @@ class OMRImage {
                 $y += $dy;
             }
             return 0;
-        }   else    {
+        } else if ($midY < $this->yCoord[44] && $midX < $this->yCoord[27]) {
             return $this->isBlackDot($midX, $midY);
-        }
+        } else  {
+            return 0;
+        }            
     }
 
     public function debugImage() {
@@ -482,4 +486,5 @@ class OMRImage {
         imagecopy($newImg, $im, 0, 0, $realX, 0, $lastX - $realX, $lastY);
         $this->setCore($newImg);
     }
+
 }
