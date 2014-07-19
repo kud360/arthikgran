@@ -322,7 +322,7 @@ class OMRImage {
         $maxY = round($y + $this->cellSize / 2.5);
         for ($i = $minX; $i < $maxX; $i++) {
             for ($j = $minY; $j < $maxY; $j++) {
-                if ((imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0x99) {
+                if ((imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0xAA) {
                     $counter++;
                 }
             }
@@ -346,7 +346,7 @@ class OMRImage {
     }
 
     private function isGridMarked($midX, $midY) {
-        if ($midY > $this->yCoord[38] && $midY < $this->yCoord[48]) {            
+        if ($midX > $this->xCoord[12] && $midY > $this->yCoord[38] && $midY < $this->yCoord[48]) {            
             $X = round($this->radius * 0.5);            
             $Y = round($this->radius * 0.5);
             $midX += round($this->radius * 0.25);            
