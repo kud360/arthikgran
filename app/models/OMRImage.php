@@ -291,7 +291,7 @@ class OMRImage {
                 $draw->background('#00f');
                 $draw->border(1, '#f00');
             });
-        }
+        } 
 
         $this->image->rotate(360 - $rotation, 0xFFFFFF);
         $this->maxY = $this->height();
