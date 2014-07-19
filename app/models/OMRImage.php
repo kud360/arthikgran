@@ -28,7 +28,7 @@ class OMRImage {
     private $maxX, $maxY;
     private $health;
     private $boolImage;
-    private $blackMark = 0x80;    
+    private $blackMark = 0x80;
 
     public function __call($method_name, $args) {
         if (method_exists($this->image, $method_name)) {
@@ -54,7 +54,9 @@ class OMRImage {
         Debugbar::startMeasure('calculate', 'Calculate');
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
-        $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
+        $tempImg = imagecreatetruecolor(1653, 2338);
+        imagecopyresized($tempImg, $this->image->getCore(), 0, 0, 0, 0, 1653, 2338, $this->maxX, $this->maxY);
+        $this->setCore($tempImg);        
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
@@ -171,7 +173,7 @@ class OMRImage {
                 $cellAverageGrid[$i] = $sum;
             }
         }
-        
+
         Debugbar::debug("cellAverageGrid : ", $cellAverageGrid);
 
         // Finding the co-rodinate of strips
@@ -273,7 +275,7 @@ class OMRImage {
 
         Debugbar::debug("Bottom Trace Completed");
         $angle_radian = atan(($bottom_margin - $top_margin) / ($bottom_y - $top_y));
-        $rotation = ($angle_radian / (2 * pi())) * 360 * 1.2;        
+        $rotation = ($angle_radian / (2 * pi())) * 360 * 1.2;
         Debugbar::info("Rotation : " . $rotation, array(
             "bottom_x" => $bottom_margin,
             "bottom_y" => $bottom_y,
@@ -291,7 +293,7 @@ class OMRImage {
                 $draw->background('#00f');
                 $draw->border(1, '#f00');
             });
-        } 
+        }
 
         $this->image->rotate(360 - $rotation, 0xFFFFFF);
         $this->maxY = $this->height();
@@ -317,7 +319,7 @@ class OMRImage {
         $maxY = round($y + $this->cellSize / 2.5);
         for ($i = $minX; $i < $maxX; $i++) {
             for ($j = $minY; $j < $maxY; $j++) {
-                if ( (imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0xB0 ) {
+                if ((imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0xB0) {
                     $counter++;
                 }
             }
