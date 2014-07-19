@@ -28,7 +28,7 @@ Route::get('/test', function() {
 Route::post('/test', function() {
     Debugbar::disable();
     $validator = Validator::make(Input::file(), array(
-                "image" => 'required|image|max:2048'
+                "image" => 'required|image|max:524288'
     ));
 
     if ($validator->fails()) {
@@ -59,7 +59,7 @@ Route::post('/parse', function() {
             }
 
             $validator = Validator::make(
-                            array('file' => $upload), array('file' => 'required|image|max:2048')
+                            array('file' => $upload), array('file' => 'required|image|max:524288')
             );
 
             if ($validator->passes()) {

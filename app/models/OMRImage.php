@@ -27,7 +27,8 @@ class OMRImage {
     private $imageCore;
     private $maxX, $maxY;
     private $health;
-    private $blackMark = 0xAA;    
+    private $boolImage;
+    private $blackMark = 0x80;    
 
     public function __call($method_name, $args) {
         if (method_exists($this->image, $method_name)) {
@@ -272,7 +273,7 @@ class OMRImage {
 
         Debugbar::debug("Bottom Trace Completed");
         $angle_radian = atan(($bottom_margin - $top_margin) / ($bottom_y - $top_y));
-        $rotation = ($angle_radian / (2 * pi())) * 360;        
+        $rotation = ($angle_radian / (2 * pi())) * 360 * 1.2;        
         Debugbar::info("Rotation : " . $rotation, array(
             "bottom_x" => $bottom_margin,
             "bottom_y" => $bottom_y,
@@ -316,7 +317,7 @@ class OMRImage {
         $maxY = round($y + $this->cellSize / 2.5);
         for ($i = $minX; $i < $maxX; $i++) {
             for ($j = $minY; $j < $maxY; $j++) {
-                if ( (imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0xDD ) {
+                if ( (imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0xB0 ) {
                     $counter++;
                 }
             }
