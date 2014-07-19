@@ -45,21 +45,20 @@ class OMRImage {
     }
 
     public function prepare() {
-        $this->health = array();
-        Debugbar::startMeasure('resize', 'Resize');
+        $this->health = array();        
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $tempImg = imagecreatetruecolor(1653, 2338);
         imagecopyresized($tempImg, $this->image->getCore(), 0, 0, 0, 0, 1653, 2338, $this->maxX, $this->maxY);
         $this->setCore($tempImg);
-        Debugbar::stopMeasure('resize');
-        Debugbar::startMeasure('greyscale', 'Greyscale');
+        //Debugbar::stopMeasure('resize');
+        //Debugbar::startMeasure('greyscale', 'Greyscale');
         $this->greyscale();
-        Debugbar::stopMeasure('greyscale');
-        Debugbar::startMeasure('trim', 'Trim');
+        //Debugbar::stopMeasure('greyscale');
+        //Debugbar::startMeasure('trim', 'Trim');
         $this->trimBlack();
-        Debugbar::stopMeasure('trim');
-        Debugbar::startMeasure('calculate', 'Calculate');
+        //Debugbar::stopMeasure('trim');
+        //Debugbar::startMeasure('calculate', 'Calculate');
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
@@ -70,26 +69,26 @@ class OMRImage {
         $this->xMargin = round($this->marginSafety * $this->dpi);
         $this->yMargin = round($this->marginSafety * $this->dpi);
         $this->imageCore = $this->image->getCore();
-        Debugbar::stopMeasure('calculate');
-        Debugbar::startMeasure('preRotationStripDetect', 'Detecting Strips Before Rotation');
+        //Debugbar::stopMeasure('calculate');
+        //Debugbar::startMeasure('preRotationStripDetect', 'Detecting Strips Before Rotation');
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
-        Debugbar::info(count($this->xCoord) . 'XCoords detected', $this->xCoord);
+        //Debugbar::info(count($this->xCoord) . 'XCoords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
-        Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
-        Debugbar::stopMeasure('preRotationStripDetect');
-        Debugbar::startMeasure('rotation', 'Calling Rotation');
+        //Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
+        //Debugbar::stopMeasure('preRotationStripDetect');
+        //Debugbar::startMeasure('rotation', 'Calling Rotation');
         $this->correctRotation();
-        Debugbar::stopMeasure('rotation');
-        Debugbar::startMeasure('postRotationStripDetect', 'Detecting Strips After Rotation');
+        //Debugbar::stopMeasure('rotation');
+        //Debugbar::startMeasure('postRotationStripDetect', 'Detecting Strips After Rotation');
         $this->imageCore = $this->image->getCore();
         $this->xCoord = $this->detectGridPoints($this->yMargin, $this->width());
-        Debugbar::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
+        //Debugbar::info(count($this->xCoord) . ' X Coords detected', $this->xCoord);
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
-        Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
-        Debugbar::stopMeasure('postRotationStripDetect');
+        //Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
+        //Debugbar::stopMeasure('postRotationStripDetect');
         $this->setCircleRadius();
         $this->parseGrid();
-        Debugbar::info('Grid Parsed', $this->grid);
+        //Debugbar::info('Grid Parsed', $this->grid);
         return $this;
     }
 
