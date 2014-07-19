@@ -350,7 +350,9 @@ class OMRImage {
             for ($i = 0; $i < $maxI; $i++) {
                 if ((-$X / 2 <= $x) && ($x <= $X / 2) && (-$Y / 2 <= $y) && ($y <= $Y / 2)) {
                     if ($this->detectCircleAround($midX + $x, $midY + $y)) {                        
-                        return $this->isBlackDot($midX + $x, $midY + $y);
+                        if($this->isBlackDot($midX + $x, $midY + $y))    {
+                            return 1;
+                        }
                     }
                 }
                 if (($x == $y) || (($x < 0) && ($x == -$y)) || (($x > 0) && ($x == 1 - $y))) {
