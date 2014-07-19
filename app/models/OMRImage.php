@@ -44,7 +44,7 @@ class OMRImage {
         return $this;
     }
 
-    public function prepare() {
+    public function prepare() {        
         $this->health = array();        
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
@@ -322,7 +322,7 @@ class OMRImage {
         $maxY = round($y + $this->cellSize / 2.5);
         for ($i = $minX; $i < $maxX; $i++) {
             for ($j = $minY; $j < $maxY; $j++) {
-                if ((imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0xB0) {
+                if ((imagecolorat($this->imageCore, $i, $j) & 0xFF) < 0x99) {
                     $counter++;
                 }
             }
@@ -473,5 +473,4 @@ class OMRImage {
         imagecopy($newImg, $im, 0, 0, $realX, 0, $lastX - $realX, $lastY);
         $this->setCore($newImg);
     }
-
 }

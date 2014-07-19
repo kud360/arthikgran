@@ -12,15 +12,18 @@
  */
 
 Route::get('/', function() {
+    Debugbar::disable();
     return View::make('panel');
 });
 
 Route::get('/phpinfo', function() {
+    Debugbar::disable();
     phpinfo();
     return 1;
 });
 
 Route::get('/test', function() {
+    Debugbar::disable();
     return View::make('quickform');
 });
 
@@ -40,7 +43,7 @@ Route::post('/test', function() {
 });
 
 Route::post('/parse', function() {
-    
+    Debugbar::disable();
     if (Input::hasFile('files')) {
         $all_uploads = Input::file('files');
 
