@@ -28,6 +28,7 @@ class OMRImage {
     private $maxX, $maxY;
     private $health;
     private $boolImage;
+    private $radius;
     private $blackMark = 0x80;
 
     public function __call($method_name, $args) {
@@ -45,6 +46,13 @@ class OMRImage {
 
     public function prepare() {
         $this->health = array();
+        Debugbar::startMeasure('resize', 'Resize');
+        $this->maxX = $this->image->width();
+        $this->maxY = $this->image->height();
+        $tempImg = imagecreatetruecolor(1653, 2338);
+        imagecopyresized($tempImg, $this->image->getCore(), 0, 0, 0, 0, 1653, 2338, $this->maxX, $this->maxY);
+        $this->setCore($tempImg);
+        Debugbar::stopMeasure('resize');
         Debugbar::startMeasure('greyscale', 'Greyscale');
         $this->greyscale();
         Debugbar::stopMeasure('greyscale');
@@ -52,11 +60,6 @@ class OMRImage {
         $this->trimBlack();
         Debugbar::stopMeasure('trim');
         Debugbar::startMeasure('calculate', 'Calculate');
-        $this->maxX = $this->image->width();
-        $this->maxY = $this->image->height();
-        $tempImg = imagecreatetruecolor(1653, 2338);
-        imagecopyresized($tempImg, $this->image->getCore(), 0, 0, 0, 0, 1653, 2338, $this->maxX, $this->maxY);
-        $this->setCore($tempImg);        
         $this->maxX = $this->image->width();
         $this->maxY = $this->image->height();
         $this->dpi = round((($this->maxX / 11.7) + ($this->maxY / 8.27 )) / 2);
@@ -84,6 +87,7 @@ class OMRImage {
         $this->yCoord = $this->detectGridPoints($this->xMargin, $this->height());
         Debugbar::info(count($this->yCoord) . ' Y Coords detected', $this->yCoord);
         Debugbar::stopMeasure('postRotationStripDetect');
+        $this->setCircleRadius();
         $this->parseGrid();
         Debugbar::info('Grid Parsed', $this->grid);
         return $this;
@@ -275,7 +279,7 @@ class OMRImage {
 
         Debugbar::debug("Bottom Trace Completed");
         $angle_radian = atan(($bottom_margin - $top_margin) / ($bottom_y - $top_y));
-        $rotation = ($angle_radian / (2 * pi())) * 360 * 1.2;
+        $rotation = ($angle_radian / (2 * pi())) * 360;
         Debugbar::info("Rotation : " . $rotation, array(
             "bottom_x" => $bottom_margin,
             "bottom_y" => $bottom_y,
@@ -306,7 +310,7 @@ class OMRImage {
         foreach ($this->xCoord as $row => $x) {
             array_push($this->grid, array());
             foreach ($this->yCoord as $column => $y) {
-                array_push($this->grid[$row], $this->isBlackDot($x, $y));
+                array_push($this->grid[$row], $this->isGridMarked($x, $y));
             }
         }
     }
@@ -336,10 +340,91 @@ class OMRImage {
         }
     }
 
+    private function isGridMarked($midX, $midY) {
+        if ($midX > $this->maxX / 2 && $midY > 2 * $this->maxY / 3) {
+            $X = round($this->radius * 2);
+            $Y = round($this->radius * 2);            
+            $x = $y = $dx = 0;
+            $dy = -1;
+            $t = max($X, $Y);
+            $maxI = $t * $t;
+            for ($i = 0; $i < $maxI; $i++) {
+                if ((-$X / 2 <= $x) && ($x <= $X / 2) && (-$Y / 2 <= $y) && ($y <= $Y / 2)) {
+                    if ($this->detectCircleAround($midX + $x, $midY + $y)) {                        
+                        return $this->isBlackDot($midX + $x, $midY + $y);
+                    }
+                }
+                if (($x == $y) || (($x < 0) && ($x == -$y)) || (($x > 0) && ($x == 1 - $y))) {
+                    $t = $dx;
+                    $dx = -$dy;
+                    $dy = $t;
+                }
+                $x += $dx;
+                $y += $dy;
+            }
+            return 0;
+        }   else    {
+            return $this->isBlackDot($midX, $midY);
+        }
+    }
+
     public function debugImage() {
         $this->drawGuides();
         $this->drawMargins();
         return $this;
+    }
+
+    private function setCircleRadius() {
+        $xavg = 0;
+        for ($i = 0; $i < count($this->xCoord) - 1; $i++) {
+            $xavg = $xavg + ($this->xCoord[$i + 1] - $this->xCoord[$i]);
+        }
+        $xavg = $xavg / count($this->xCoord);
+
+        $yavg = 0;
+        for ($i = 0; $i < count($this->yCoord) - 1; $i++) {
+            $yavg = $yavg + ($this->yCoord[$i + 1] - $this->yCoord[$i]);
+        }
+        $yavg = $yavg / count($this->yCoord);
+
+        $avg = ($xavg + $yavg) / 2;
+
+        $this->radius = ( $avg / ( 0.2 ) ) * 0.08;
+
+        Log::info("Circle Detected" . $this->radius);
+    }
+
+    private function detectCircleAround($x0, $y0) {
+        $x = $this->radius;
+        $y = 0;
+        $black = 0;
+        $points = 0;
+        $radiusError = 1 - $x;
+
+        while ($x >= $y) {
+            $black += $this->isBlack($x + $x0, $y + $y0);
+            $black += $this->isBlack($y + $x0, $x + $y0);
+            $black += $this->isBlack(-$x + $x0, $y + $y0);
+            $black += $this->isBlack(-$y + $x0, $x + $y0);
+            $black += $this->isBlack(-$x + $x0, -$y + $y0);
+            $black += $this->isBlack(-$y + $x0, -$x + $y0);
+            $black += $this->isBlack($x + $x0, -$y + $y0);
+            $black += $this->isBlack($y + $x0, -$x + $y0);
+            $points += 8;
+            $y++;
+            if ($radiusError < 0) {
+                $radiusError += 2 * $y + 1;
+            } else {
+                $x--;
+                $radiusError += 2 * ($y - $x + 1);
+            }
+        }
+
+        if ($black / $points > 0.5) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     private function drawGuides() {
