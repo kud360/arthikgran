@@ -80,11 +80,9 @@ Route::post('/signup', function() {
         $userArray = Input::only('firstname', 'lastname', 'email', 'number', 'password');
         $userArray['password'] = Hash::make($userArray['password']);
         $user = User::create($userArray);
-        if (Auth::attempt(array('email' => $user->email, 'password' => $user->password))) {
-            return Redirect::to('/');
-        } else {
-            return Redirect::to('/signup');
-        }
+        Auth::loginUsingId($user->id);
+        return Redirect::to('/');
+        
     }
 });
 
