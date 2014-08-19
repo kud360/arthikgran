@@ -54,11 +54,11 @@ return array(
 
 		'mysql' => array(
 			'driver'    => 'mysql',
-			'host'      => getenv('OPENSHIFT_MYSQL_DB_HOST'),
-			'port'      => getenv('OPENSHIFT_MYSQL_DB_PORT'),
-			'database'  => getenv('OPENSHIFT_APP_NAME'),
-			'username'  => getenv('OPENSHIFT_MYSQL_DB_USERNAME'),
-			'password'  => getenv('OPENSHIFT_MYSQL_DB_PASSWORD'),
+			'host'      => 'localhost',
+			'port'      => 3306,
+			'database'  => 'bcap',
+			'username'  => 'bcap',
+			'password'  => 'pass@123',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',
